@@ -88,284 +88,302 @@
 </head>
 <body class="text-slate-800">
 
-    <!-- Monitoring Page -->
-    <div id="monitoring-page">
-        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
-            <!-- Header Section -->
-            <header class="mb-8 text-center">
-                <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Dashboard Monitoring MCU</h1>
-                <p class="mt-2 text-lg text-slate-600">PT Amman di Tirta Medical Centre</p>
-            </header>
-
-            <!-- Form Section for Data Entry -->
-            <div id="data-form-container" class="bg-white p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 id="form-title" class="text-2xl font-semibold text-slate-800">Tambah Data Peserta MCU Baru</h2>
-                    <div class="flex items-center gap-2">
-                         <button id="view-data-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Semua Data">
-                            <i data-feather="table" class="w-6 h-6"></i>
-                        </button>
-                        <button id="rekap-btn" class="p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full transition" title="Buka Halaman Rekapitulasi">
-                            <i data-feather="archive" class="w-6 h-6"></i>
-                        </button>
-                        <button id="generate-report-btn" class="p-2 text-slate-500 hover:text-yellow-600 hover:bg-yellow-100 rounded-full transition" title="Buat Laporan Konsolidasi">
-                            <i data-feather="file-text" class="w-6 h-6"></i>
-                        </button>
-                        <button id="rules-btn" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full transition" title="Lihat Aturan">
-                            <i data-feather="book-open" class="w-6 h-6"></i>
-                        </button>
-                    </div>
-                </div>
-                <form id="mcu-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Form fields for monitoring -->
-                    <input type="hidden" id="edit-id">
-                    <div>
-                        <label for="nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta MCU</label>
-                        <input type="text" id="nama-peserta" placeholder="Contoh: Budi Santoso" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    </div>
-                    <div>
-                        <label for="asal-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Asal Perusahaan</label>
-                        <input type="text" id="asal-perusahaan" list="perusahaan-list" placeholder="Ketik atau pilih perusahaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <datalist id="perusahaan-list"></datalist>
-                    </div>
-                    <div>
-                        <label for="surat-pengantar" class="block text-sm font-medium text-slate-700 mb-1">Surat Pengantar (SP)</label>
-                        <input type="text" id="surat-pengantar" placeholder="Nomor SP, URL, atau 'menyusul'" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    </div>
-                    <div>
-                        <label for="email-tujuan" class="block text-sm font-medium text-slate-700 mb-1">Email Tujuan</label>
-                        <input type="email" id="email-tujuan" list="email-list" placeholder="Ketik atau pilih email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <datalist id="email-list"></datalist>
-                    </div>
-                    <div>
-                        <label for="tanggal-pelaksanaan" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Pelaksanaan</label>
-                        <input type="date" id="tanggal-pelaksanaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    </div>
-                    <div>
-                        <label for="tanggal-deadline" class="block text-sm font-medium text-slate-700 mb-1">Deadline Release Hasil</label>
-                        <input type="date" id="tanggal-deadline" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-slate-50" readonly>
-                    </div>
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                        <select id="status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            <option value="Pending">Pending</option>
-                            <option value="On Process">On Process</option>
-                            <option value="Released">Released</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="cabang-klinik" class="block text-sm font-medium text-slate-700 mb-1">Cabang Klinik</label>
-                        <input type="text" id="cabang-klinik" list="klinik-list" placeholder="Ketik untuk mencari..." required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <datalist id="klinik-list"></datalist>
-                    </div>
-                    <div class="md:col-span-3 flex items-center justify-end gap-4 pt-4">
-                        <button type="button" id="cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Batal</button>
-                        <button type="submit" id="submit-btn" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
-                            <i data-feather="plus-circle" class="w-5 h-5"></i>
-                            <span id="submit-btn-text">Tambah Data</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Footer -->
-            <footer class="text-center mt-12 text-sm text-slate-500">
-                <p>Aplikasi Monitoring MCU by Agus Budiartha</p>
-            </footer>
+    <!-- Login Page -->
+    <div id="login-page" class="flex items-center justify-center min-h-screen bg-slate-100">
+        <div class="text-center bg-white p-12 rounded-2xl shadow-xl">
+            <h1 class="text-3xl font-bold text-slate-900">Aplikasi Monitoring MCU</h1>
+            <p class="mt-2 text-slate-600">Silakan masuk untuk melanjutkan.</p>
+            <button id="google-signin-btn" class="mt-8 inline-flex items-center gap-3 bg-white border border-slate-300 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-50 transition">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.542,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                <span>Masuk dengan Google</span>
+            </button>
         </div>
     </div>
 
-    <!-- Data View Page (hidden by default) -->
-    <div id="data-view-page" class="hidden">
-        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
-            <header class="mb-8 flex justify-between items-center">
-                <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Semua Data Pelaksanaan MCU</h1>
-                <button id="back-to-monitoring-from-view-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
-                    <i data-feather="arrow-left" class="w-5 h-5"></i>
-                    <span>Kembali ke Dashboard</span>
-                </button>
-            </header>
+    <!-- App Container (All pages go inside here) -->
+    <div id="app-container" class="hidden">
+        <!-- Monitoring Page -->
+        <div id="monitoring-page">
+            <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+                <!-- Header Section -->
+                <header class="mb-8 text-center">
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Dashboard Monitoring MCU</h1>
+                    <p class="mt-2 text-lg text-slate-600">PT Amman di Tirta Medical Centre</p>
+                </header>
 
-            <div class="bg-white p-6 rounded-2xl shadow-lg">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                     <div class="relative flex-grow w-full md:w-auto">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <i data-feather="search" class="w-5 h-5 text-slate-400"></i>
+                <!-- Form Section for Data Entry -->
+                <div id="data-form-container" class="bg-white p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="form-title" class="text-2xl font-semibold text-slate-800">Tambah Data Peserta MCU Baru</h2>
+                        <div class="flex items-center gap-2">
+                             <button id="view-data-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Semua Data">
+                                <i data-feather="table" class="w-6 h-6"></i>
+                            </button>
+                            <button id="rekap-btn" class="p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full transition" title="Buka Halaman Rekapitulasi">
+                                <i data-feather="archive" class="w-6 h-6"></i>
+                            </button>
+                            <button id="generate-report-btn" class="p-2 text-slate-500 hover:text-yellow-600 hover:bg-yellow-100 rounded-full transition" title="Buat Laporan Konsolidasi">
+                                <i data-feather="file-text" class="w-6 h-6"></i>
+                            </button>
+                            <button id="rules-btn" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full transition" title="Lihat Aturan">
+                                <i data-feather="book-open" class="w-6 h-6"></i>
+                            </button>
+                            <button id="signout-btn" class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-100 rounded-full transition" title="Keluar">
+                                <i data-feather="log-out" class="w-6 h-6"></i>
+                            </button>
                         </div>
-                        <input type="text" id="view-search-input" placeholder="Cari Nama atau Perusahaan..." class="w-full md:w-80 pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                     </div>
-                    <button id="view-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition flex items-center gap-2 whitespace-nowrap">
-                        <i data-feather="download" class="w-4 h-4"></i>
-                        <span>Export ke Excel</span>
-                    </button>
+                    <form id="mcu-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Form fields for monitoring -->
+                        <input type="hidden" id="edit-id">
+                        <div>
+                            <label for="nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta MCU</label>
+                            <input type="text" id="nama-peserta" placeholder="Contoh: Budi Santoso" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="asal-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Asal Perusahaan</label>
+                            <input type="text" id="asal-perusahaan" list="perusahaan-list" placeholder="Ketik atau pilih perusahaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <datalist id="perusahaan-list"></datalist>
+                        </div>
+                        <div>
+                            <label for="surat-pengantar" class="block text-sm font-medium text-slate-700 mb-1">Surat Pengantar (SP)</label>
+                            <input type="text" id="surat-pengantar" placeholder="Nomor SP, URL, atau 'menyusul'" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="email-tujuan" class="block text-sm font-medium text-slate-700 mb-1">Email Tujuan</label>
+                            <input type="email" id="email-tujuan" list="email-list" placeholder="Ketik atau pilih email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <datalist id="email-list"></datalist>
+                        </div>
+                        <div>
+                            <label for="tanggal-pelaksanaan" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Pelaksanaan</label>
+                            <input type="date" id="tanggal-pelaksanaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="tanggal-deadline" class="block text-sm font-medium text-slate-700 mb-1">Deadline Release Hasil</label>
+                            <input type="date" id="tanggal-deadline" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-slate-50" readonly>
+                        </div>
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                            <select id="status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <option value="Pending">Pending</option>
+                                <option value="On Process">On Process</option>
+                                <option value="Released">Released</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="cabang-klinik" class="block text-sm font-medium text-slate-700 mb-1">Cabang Klinik</label>
+                            <input type="text" id="cabang-klinik" list="klinik-list" placeholder="Ketik untuk mencari..." required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <datalist id="klinik-list"></datalist>
+                        </div>
+                        <div class="md:col-span-3 flex items-center justify-end gap-4 pt-4">
+                            <button type="button" id="cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Batal</button>
+                            <button type="submit" id="submit-btn" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                                <i data-feather="plus-circle" class="w-5 h-5"></i>
+                                <span id="submit-btn-text">Tambah Data</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 
-                <div class="table-responsive">
-                    <table class="w-full text-sm text-left text-slate-500">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-100">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 rounded-l-lg">Nama Peserta</th>
-                                <th scope="col" class="px-6 py-3">Perusahaan</th>
-                                <th scope="col" class="px-6 py-3">Surat Pengantar</th>
-                                <th scope="col" class="px-6 py-3">Email Tujuan</th>
-                                <th scope="col" class="px-6 py-3">Tgl Pelaksanaan</th>
-                                <th scope="col" class="px-6 py-3">Deadline</th>
-                                <th scope="col" class="px-6 py-3 text-center w-48">Sisa Hari</th>
-                                <th scope="col" class="px-6 py-3 text-center w-56">Status</th>
-                                <th scope="col" class="px-6 py-3">Info Tambahan</th>
-                                <th scope="col" class="px-6 py-3 text-center">Rilis</th>
-                                <th scope="col" class="px-6 py-3 rounded-r-lg text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="data-view-table-body"></tbody>
-                    </table>
-                </div>
-                <p id="no-view-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data aktif.</p>
+                <!-- Footer -->
+                <footer class="text-center mt-12 text-sm text-slate-500">
+                    <p>Aplikasi Monitoring MCU by Agus Budiartha</p>
+                </footer>
             </div>
         </div>
-    </div>
 
-    <!-- Rekapitulasi Page (hidden by default) -->
-    <div id="rekap-page" class="hidden">
-        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
-            <header class="mb-8 flex justify-between items-center">
-                <h1 id="rekap-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Rekapitulasi Data MCU</h1>
-                <div>
-                    <button id="back-to-monitoring-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+        <!-- Data View Page (hidden by default) -->
+        <div id="data-view-page" class="hidden">
+            <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+                <header class="mb-8 flex justify-between items-center">
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Semua Data Pelaksanaan MCU</h1>
+                    <button id="back-to-monitoring-from-view-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
                         <i data-feather="arrow-left" class="w-5 h-5"></i>
-                        <span>Kembali ke Monitoring</span>
+                        <span>Kembali ke Dashboard</span>
                     </button>
-                </div>
-            </header>
+                </header>
 
-            <!-- Form Rekapitulasi -->
-            <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-semibold text-slate-800">Tambah Data Rekapitulasi</h2>
-                    <div class="flex items-center gap-2">
-                        <button id="import-rekap-btn" class="p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-100 rounded-full transition" title="Import Data dari Excel">
-                            <i data-feather="upload" class="w-6 h-6"></i>
-                        </button>
-                        <button id="view-rekap-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Tabel Rekapitulasi">
-                            <i data-feather="table" class="w-6 h-6"></i>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                         <div class="relative flex-grow w-full md:w-auto">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i data-feather="search" class="w-5 h-5 text-slate-400"></i>
+                            </div>
+                            <input type="text" id="view-search-input" placeholder="Cari Nama atau Perusahaan..." class="w-full md:w-80 pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <button id="view-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition flex items-center gap-2 whitespace-nowrap">
+                            <i data-feather="download" class="w-4 h-4"></i>
+                            <span>Export ke Excel</span>
                         </button>
                     </div>
+                    
+                    <div class="table-responsive">
+                        <table class="w-full text-sm text-left text-slate-500">
+                            <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 rounded-l-lg">Nama Peserta</th>
+                                    <th scope="col" class="px-6 py-3">Perusahaan</th>
+                                    <th scope="col" class="px-6 py-3">Surat Pengantar</th>
+                                    <th scope="col" class="px-6 py-3">Email Tujuan</th>
+                                    <th scope="col" class="px-6 py-3">Tgl Pelaksanaan</th>
+                                    <th scope="col" class="px-6 py-3">Deadline</th>
+                                    <th scope="col" class="px-6 py-3 text-center w-48">Sisa Hari</th>
+                                    <th scope="col" class="px-6 py-3 text-center w-56">Status</th>
+                                    <th scope="col" class="px-6 py-3">Info Tambahan</th>
+                                    <th scope="col" class="px-6 py-3 text-center">Rilis</th>
+                                    <th scope="col" class="px-6 py-3 rounded-r-lg text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-view-table-body"></tbody>
+                        </table>
+                    </div>
+                    <p id="no-view-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data aktif.</p>
                 </div>
-                <input type="file" id="rekap-file-input" class="hidden" accept=".xlsx, .xls, .csv">
-                <form id="rekap-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <input type="hidden" id="rekap-edit-id">
-                    <div>
-                        <label for="rekap-nama-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Nama Perusahaan</label>
-                        <input type="text" id="rekap-nama-perusahaan" list="perusahaan-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta</label>
-                        <input type="text" id="rekap-nama-peserta" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-nik" class="block text-sm font-medium text-slate-700 mb-1">NIK</label>
-                        <input type="text" id="rekap-nik" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-usia" class="block text-sm font-medium text-slate-700 mb-1">Usia</label>
-                        <input type="number" id="rekap-usia" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-jenis-kelamin" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
-                        <select id="rekap-jenis-kelamin" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                            <option>Pria</option>
-                            <option>Wanita</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="rekap-hasil-kesimpulan" class="block text-sm font-medium text-slate-700 mb-1">Hasil Kesimpulan</label>
-                        <input type="text" id="rekap-hasil-kesimpulan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-status-kesehatan" class="block text-sm font-medium text-slate-700 mb-1">Status Kesehatan</label>
-                        <select id="rekap-status-kesehatan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                            <option>FIT</option>
-                            <option>FIT WITH NOTE RINGAN</option>
-                            <option>FIT WITH NOTE SEDANG</option>
-                            <option>FIT WITH NOTE BERAT</option>
-                            <option>TEMPORARY UNFIT</option>
-                            <option>UNFIT</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="rekap-note" class="block text-sm font-medium text-slate-700 mb-1">Note</label>
-                        <input type="text" id="rekap-note" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-tgl-mcu" class="block text-sm font-medium text-slate-700 mb-1">Tgl. MCU</label>
-                        <input type="date" id="rekap-tgl-mcu" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-tgl-pengiriman" class="block text-sm font-medium text-slate-700 mb-1">Tgl. Pengiriman Hasil</label>
-                        <input type="date" id="rekap-tgl-pengiriman" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="rekap-kpi" class="block text-sm font-medium text-slate-700 mb-1">KPI (Hari)</label>
-                        <input type="text" id="rekap-kpi" class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50" readonly>
-                    </div>
-                    <div>
-                        <label for="rekap-lokasi-mcu" class="block text-sm font-medium text-slate-700 mb-1">Lokasi MCU</label>
-                        <input type="text" id="rekap-lokasi-mcu" list="klinik-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div class="md:col-span-full">
-                        <label for="rekap-ket" class="block text-sm font-medium text-slate-700 mb-1">Keterangan</label>
-                        <input type="text" id="rekap-ket" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
-                    </div>
-                    <div class="md:col-span-full flex justify-end gap-4">
-                         <button type="button" id="rekap-cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg">Batal</button>
-                        <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg flex items-center gap-2">
-                            <i data-feather="plus-circle" class="w-5 h-5"></i>
-                            <span id="rekap-submit-btn-text">Tambah Rekap</span>
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
 
-    <!-- Rekap View Page (hidden by default) -->
-    <div id="rekap-view-page" class="hidden">
-        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
-            <header class="mb-8 flex justify-between items-center">
-                <h1 id="rekap-view-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Tabel Rekapitulasi</h1>
-                <button id="back-to-rekap-form-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
-                    <i data-feather="arrow-left" class="w-5 h-5"></i>
-                    <span>Kembali ke Input Rekap</span>
-                </button>
-            </header>
+        <!-- Rekapitulasi Page (hidden by default) -->
+        <div id="rekap-page" class="hidden">
+            <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+                <header class="mb-8 flex justify-between items-center">
+                    <h1 id="rekap-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Rekapitulasi Data MCU</h1>
+                    <div>
+                        <button id="back-to-monitoring-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                            <i data-feather="arrow-left" class="w-5 h-5"></i>
+                            <span>Kembali ke Monitoring</span>
+                        </button>
+                    </div>
+                </header>
 
-            <div class="bg-white p-6 rounded-2xl shadow-lg">
-                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                    <h2 class="text-2xl font-semibold text-slate-800">Data Rekapitulasi</h2>
-                    <button id="rekap-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg flex items-center gap-2 whitespace-nowrap">
-                        <i data-feather="download" class="w-4 h-4"></i>
-                        <span>Export Rekap ke Excel</span>
+                <!-- Form Rekapitulasi -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                     <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-slate-800">Tambah Data Rekapitulasi</h2>
+                        <div class="flex items-center gap-2">
+                            <button id="import-rekap-btn" class="p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-100 rounded-full transition" title="Import Data dari Excel">
+                                <i data-feather="upload" class="w-6 h-6"></i>
+                            </button>
+                            <button id="view-rekap-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Tabel Rekapitulasi">
+                                <i data-feather="table" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" id="rekap-file-input" class="hidden" accept=".xlsx, .xls, .csv">
+                    <form id="rekap-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <input type="hidden" id="rekap-edit-id">
+                        <div>
+                            <label for="rekap-nama-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Nama Perusahaan</label>
+                            <input type="text" id="rekap-nama-perusahaan" list="perusahaan-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta</label>
+                            <input type="text" id="rekap-nama-peserta" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-nik" class="block text-sm font-medium text-slate-700 mb-1">NIK</label>
+                            <input type="text" id="rekap-nik" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-usia" class="block text-sm font-medium text-slate-700 mb-1">Usia</label>
+                            <input type="number" id="rekap-usia" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-jenis-kelamin" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
+                            <select id="rekap-jenis-kelamin" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                                <option>Pria</option>
+                                <option>Wanita</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="rekap-hasil-kesimpulan" class="block text-sm font-medium text-slate-700 mb-1">Hasil Kesimpulan</label>
+                            <input type="text" id="rekap-hasil-kesimpulan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-status-kesehatan" class="block text-sm font-medium text-slate-700 mb-1">Status Kesehatan</label>
+                            <select id="rekap-status-kesehatan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                                <option>FIT</option>
+                                <option>FIT WITH NOTE RINGAN</option>
+                                <option>FIT WITH NOTE SEDANG</option>
+                                <option>FIT WITH NOTE BERAT</option>
+                                <option>TEMPORARY UNFIT</option>
+                                <option>UNFIT</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="rekap-note" class="block text-sm font-medium text-slate-700 mb-1">Note</label>
+                            <input type="text" id="rekap-note" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-tgl-mcu" class="block text-sm font-medium text-slate-700 mb-1">Tgl. MCU</label>
+                            <input type="date" id="rekap-tgl-mcu" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-tgl-pengiriman" class="block text-sm font-medium text-slate-700 mb-1">Tgl. Pengiriman Hasil</label>
+                            <input type="date" id="rekap-tgl-pengiriman" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="rekap-kpi" class="block text-sm font-medium text-slate-700 mb-1">KPI (Hari)</label>
+                            <input type="text" id="rekap-kpi" class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50" readonly>
+                        </div>
+                        <div>
+                            <label for="rekap-lokasi-mcu" class="block text-sm font-medium text-slate-700 mb-1">Lokasi MCU</label>
+                            <input type="text" id="rekap-lokasi-mcu" list="klinik-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div class="md:col-span-full">
+                            <label for="rekap-ket" class="block text-sm font-medium text-slate-700 mb-1">Keterangan</label>
+                            <input type="text" id="rekap-ket" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div class="md:col-span-full flex justify-end gap-4">
+                             <button type="button" id="rekap-cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg">Batal</button>
+                            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg flex items-center gap-2">
+                                <i data-feather="plus-circle" class="w-5 h-5"></i>
+                                <span id="rekap-submit-btn-text">Tambah Rekap</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rekap View Page (hidden by default) -->
+        <div id="rekap-view-page" class="hidden">
+            <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+                <header class="mb-8 flex justify-between items-center">
+                    <h1 id="rekap-view-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Tabel Rekapitulasi</h1>
+                    <button id="back-to-rekap-form-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                        <i data-feather="arrow-left" class="w-5 h-5"></i>
+                        <span>Kembali ke Input Rekap</span>
                     </button>
+                </header>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-semibold text-slate-800">Data Rekapitulasi</h2>
+                        <button id="rekap-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg flex items-center gap-2 whitespace-nowrap">
+                            <i data-feather="download" class="w-4 h-4"></i>
+                            <span>Export Rekap ke Excel</span>
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="w-full text-sm text-left text-slate-500">
+                            <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                <tr>
+                                    <th class="px-6 py-3">Nama Perusahaan</th>
+                                    <th class="px-6 py-3">Nama Peserta</th>
+                                    <th class="px-6 py-3">Hasil</th>
+                                    <th class="px-6 py-3">Tgl. MCU</th>
+                                    <th class="px-6 py-3">Tgl. Kirim</th>
+                                    <th class="px-6 py-3">KPI (Hari)</th>
+                                    <th class="px-6 py-3">Lokasi</th>
+                                    <th class="px-6 py-3">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rekap-table-body"></tbody>
+                        </table>
+                    </div>
+                     <p id="no-rekap-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data rekapitulasi untuk cabang ini.</p>
                 </div>
-                <div class="table-responsive">
-                    <table class="w-full text-sm text-left text-slate-500">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-100">
-                            <tr>
-                                <th class="px-6 py-3">Nama Perusahaan</th>
-                                <th class="px-6 py-3">Nama Peserta</th>
-                                <th class="px-6 py-3">Hasil</th>
-                                <th class="px-6 py-3">Tgl. MCU</th>
-                                <th class="px-6 py-3">Tgl. Kirim</th>
-                                <th class="px-6 py-3">KPI (Hari)</th>
-                                <th class="px-6 py-3">Lokasi</th>
-                                <th class="px-6 py-3">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rekap-table-body"></tbody>
-                    </table>
-                </div>
-                 <p id="no-rekap-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data rekapitulasi untuk cabang ini.</p>
             </div>
         </div>
     </div>
@@ -522,58 +540,37 @@
     <!-- SCRIPT UTAMA APLIKASI -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
       
+        // =================================================================================
+        // PASTE KONFIGURASI FIREBASE ANDA DI SINI
+        // =================================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyA20m4mQki6Kkpz0Z-wVUwzF4O08VEYOQg",
+            authDomain: "mcu-monitoring.firebaseapp.com",
+            projectId: "mcu-monitoring",
+            storageBucket: "mcu-monitoring.appspot.com",
+            messagingSenderId: "657976635162",
+            appId: "1:657976635162:web:1f2772ddea1c7093b9c6a3"
+        };
+        // =================================================================================
+
         document.addEventListener('DOMContentLoaded', () => {
             
-            // =================================================================================
-            // PASTE KONFIGURASI FIREBASE ANDA DI SINI
-            // =================================================================================
-            const firebaseConfig = {
-                // apiKey: "AIzaSyA20m4mQki6Kkpz0Z-wVUwzF4O08VEYOQg",
-                // authDomain: "mcu-monitoring.firebaseapp.com",
-                // projectId: "mcu-monitoring",
-                // storageBucket: "mcu-monitoring.firebasestorage.app",
-                // messagingSenderId: "657976635162",
-                // appId: "1:657976635162:web:1f2772ddea1c7093b9c6a3"
-            };
-            // =================================================================================
-            
-            // --- Cek apakah Firebase config sudah diisi ---
-            if (!firebaseConfig.apiKey) {
-                console.warn("Konfigurasi Firebase belum diisi. Aplikasi akan berjalan dalam mode offline.");
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("GANTI_DENGAN")) {
+                document.getElementById('login-page').innerHTML = `
+                <div class="text-center bg-white p-12 rounded-2xl shadow-xl">
+                    <h1 class="text-3xl font-bold text-red-600">Konfigurasi Error</h1>
+                    <p class="mt-2 text-slate-600">Konfigurasi Firebase belum diisi di dalam kode.<br>Aplikasi tidak dapat berjalan.</p>
+                </div>`;
+                return;
             }
             
-            // --- Inisialisasi Firebase (hanya jika config ada) ---
-            let app, auth, db;
-            if (firebaseConfig.apiKey) {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                // --- Autentikasi ---
-                (async () => {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (error) {
-                        console.error("Firebase Auth Error:", error);
-                        alert("Gagal melakukan autentikasi ke Firebase: " + error.message);
-                    }
-                })();
-
-                onAuthStateChanged(auth, user => {
-                    if (user) {
-                        console.log("User terautentikasi (Firebase).");
-                        window.dispatchEvent(new CustomEvent('firebase-auth-ready'));
-                    }
-                });
-            }
-
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const appId = firebaseConfig.appId;
 
             // --- SHARED ELEMENTS & DATA ---
             const klinikList = document.getElementById('klinik-list');
@@ -585,6 +582,42 @@
                 klinikList.appendChild(option);
             });
 
+            // --- PAGE & AUTH LOGIC ---
+            const loginPage = document.getElementById('login-page');
+            const appContainer = document.getElementById('app-container');
+            const googleSignInBtn = document.getElementById('google-signin-btn');
+            const signOutBtn = document.getElementById('signout-btn');
+            
+            googleSignInBtn.addEventListener('click', async () => {
+                const provider = new GoogleAuthProvider();
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (error) {
+                    console.error("Google Sign-In Error:", error);
+                    alert("Gagal masuk dengan Google: " + error.message);
+                }
+            });
+
+            signOutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Sign Out Error:", error);
+                }
+            });
+
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    loginPage.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    window.dispatchEvent(new CustomEvent('firebase-auth-ready'));
+                    feather.replace();
+                } else {
+                    loginPage.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
+                }
+            });
+            
             // --- PAGE SWITCHING LOGIC ---
             const monitoringPage = document.getElementById('monitoring-page');
             const dataViewPage = document.getElementById('data-view-page');
@@ -1053,11 +1086,7 @@
                     });
                 }
                 
-                if (firebaseConfig.apiKey) {
-                    window.addEventListener('firebase-auth-ready', listenToMonitoringData);
-                }
-
-                feather.replace();
+                window.addEventListener('firebase-auth-ready', listenToMonitoringData);
             };
 
             // --- REKAPITULASI PAGE SCRIPT ---
@@ -1340,7 +1369,7 @@
                     }
                 });
 
-                confirmReportBtn.addEventListener('click', () => {
+                confirmReportBtn.addEventListener('click', async () => {
                     const startDate = startDateInput.value;
                     const endDate = endDateInput.value;
 
@@ -1349,17 +1378,20 @@
                         return;
                     }
                     
-                    const rekapData = JSON.parse(localStorage.getItem('rekapitulasiMcuData')) || {};
                     let allDataInRange = [];
+                    for(const branch of cabangKlinikOptions) {
+                        const rekapCollectionRef = collection(db, `artifacts/${appId}/public/data/rekapitulasi/${branch}/data`);
+                        const q = query(rekapCollectionRef);
+                        const querySnapshot = await getDocs(q);
+                        const branchData = querySnapshot.docs.map(doc => doc.data());
 
-                    for (const branch in rekapData) {
-                        const branchData = rekapData[branch] || [];
                         const filteredData = branchData.filter(item => {
                             const mcuDate = new Date(item.tglMcu);
                             return mcuDate >= new Date(startDate) && mcuDate <= new Date(endDate);
                         });
                         allDataInRange.push(...filteredData);
                     }
+
 
                     if (allDataInRange.length === 0) {
                         showInfoModal('Informasi', 'Tidak ada data rekapitulasi yang ditemukan pada periode tanggal yang dipilih.', 'success');
@@ -1399,17 +1431,9 @@
             };
 
             // --- INITIATE SCRIPTS ---
-            if (firebaseConfig.apiKey) {
-                // Versi Online
-                console.log("Menjalankan dalam mode online (Firebase).");
-                // (Logika online akan berada di sini)
-            } else {
-                // Versi Offline/Lokal
-                console.log("Menjalankan dalam mode offline (localStorage).");
-                monitoringScript();
-                rekapScript();
-                consolidatedReportScript();
-            }
+            monitoringScript();
+            rekapScript();
+            consolidatedReportScript();
         });
     </script>
 </body>
