@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Monitoring MCU - PT Amman (Online)</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons for UI icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <!-- SheetJS (xlsx) library for Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <style>
+        /* Custom styles to complement Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; /* slate-100 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* slate-300 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* slate-400 */
+        }
+        /* Style for the form when in edit mode */
+        .editing-mode {
+            border: 2px solid #3b82f6; /* blue-500 */
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+        .table-responsive {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* Style for greyed-out rows */
+        .greyed-out {
+            background-color: #f8fafc; /* slate-50 */
+            opacity: 0.6;
+        }
+        .greyed-out:hover {
+            opacity: 0.8;
+        }
+        /* Minimal styling for inputs inside the table */
+        .info-input, .status-select {
+            border: 1px solid transparent;
+            border-radius: 6px;
+            padding: 4px 6px;
+            transition: border-color 0.2s;
+        }
+        .info-input:focus, .status-select:focus {
+            outline: none;
+            border-color: #3b82f6; /* blue-500 */
+        }
+        /* Tab styling */
+        .tab-btn.active {
+            border-color: #3b82f6; /* blue-500 */
+            color: #3b82f6;
+            background-color: #eff6ff; /* blue-50 */
+        }
+        /* Branch button styling */
+        .branch-button {
+            transition: all 0.2s;
+        }
+        .branch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Monitoring Page -->
+    <div id="monitoring-page">
+        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+            <!-- Header Section -->
+            <header class="mb-8 text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Dashboard Monitoring MCU</h1>
+                <p class="mt-2 text-lg text-slate-600">PT Amman di Tirta Medical Centre</p>
+            </header>
+
+            <!-- Form Section for Data Entry -->
+            <div id="data-form-container" class="bg-white p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="form-title" class="text-2xl font-semibold text-slate-800">Tambah Data Peserta MCU Baru</h2>
+                    <div class="flex items-center gap-2">
+                         <button id="view-data-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Semua Data">
+                            <i data-feather="table" class="w-6 h-6"></i>
+                        </button>
+                        <button id="rekap-btn" class="p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full transition" title="Buka Halaman Rekapitulasi">
+                            <i data-feather="archive" class="w-6 h-6"></i>
+                        </button>
+                        <button id="generate-report-btn" class="p-2 text-slate-500 hover:text-yellow-600 hover:bg-yellow-100 rounded-full transition" title="Buat Laporan Konsolidasi">
+                            <i data-feather="file-text" class="w-6 h-6"></i>
+                        </button>
+                        <button id="rules-btn" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full transition" title="Lihat Aturan">
+                            <i data-feather="book-open" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+                <form id="mcu-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Form fields for monitoring -->
+                    <input type="hidden" id="edit-id">
+                    <div>
+                        <label for="nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta MCU</label>
+                        <input type="text" id="nama-peserta" placeholder="Contoh: Budi Santoso" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="asal-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Asal Perusahaan</label>
+                        <input type="text" id="asal-perusahaan" list="perusahaan-list" placeholder="Ketik atau pilih perusahaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <datalist id="perusahaan-list"></datalist>
+                    </div>
+                    <div>
+                        <label for="surat-pengantar" class="block text-sm font-medium text-slate-700 mb-1">Surat Pengantar (SP)</label>
+                        <input type="text" id="surat-pengantar" placeholder="Nomor SP, URL, atau 'menyusul'" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="email-tujuan" class="block text-sm font-medium text-slate-700 mb-1">Email Tujuan</label>
+                        <input type="email" id="email-tujuan" list="email-list" placeholder="Ketik atau pilih email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <datalist id="email-list"></datalist>
+                    </div>
+                    <div>
+                        <label for="tanggal-pelaksanaan" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Pelaksanaan</label>
+                        <input type="date" id="tanggal-pelaksanaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="tanggal-deadline" class="block text-sm font-medium text-slate-700 mb-1">Deadline Release Hasil</label>
+                        <input type="date" id="tanggal-deadline" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-slate-50" readonly>
+                    </div>
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                        <select id="status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <option value="Pending">Pending</option>
+                            <option value="On Process">On Process</option>
+                            <option value="Released">Released</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cabang-klinik" class="block text-sm font-medium text-slate-700 mb-1">Cabang Klinik</label>
+                        <input type="text" id="cabang-klinik" list="klinik-list" placeholder="Ketik untuk mencari..." required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <datalist id="klinik-list"></datalist>
+                    </div>
+                    <div class="md:col-span-3 flex items-center justify-end gap-4 pt-4">
+                        <button type="button" id="cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Batal</button>
+                        <button type="submit" id="submit-btn" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                            <i data-feather="plus-circle" class="w-5 h-5"></i>
+                            <span id="submit-btn-text">Tambah Data</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="text-center mt-12 text-sm text-slate-500">
+                <p>Aplikasi Monitoring MCU by Agus Budiartha</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Data View Page (hidden by default) -->
+    <div id="data-view-page" class="hidden">
+        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+            <header class="mb-8 flex justify-between items-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Semua Data Pelaksanaan MCU</h1>
+                <button id="back-to-monitoring-from-view-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                    <i data-feather="arrow-left" class="w-5 h-5"></i>
+                    <span>Kembali ke Dashboard</span>
+                </button>
+            </header>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                     <div class="relative flex-grow w-full md:w-auto">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i data-feather="search" class="w-5 h-5 text-slate-400"></i>
+                        </div>
+                        <input type="text" id="view-search-input" placeholder="Cari Nama atau Perusahaan..." class="w-full md:w-80 pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <button id="view-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition flex items-center gap-2 whitespace-nowrap">
+                        <i data-feather="download" class="w-4 h-4"></i>
+                        <span>Export ke Excel</span>
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="w-full text-sm text-left text-slate-500">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 rounded-l-lg">Nama Peserta</th>
+                                <th scope="col" class="px-6 py-3">Perusahaan</th>
+                                <th scope="col" class="px-6 py-3">Surat Pengantar</th>
+                                <th scope="col" class="px-6 py-3">Email Tujuan</th>
+                                <th scope="col" class="px-6 py-3">Tgl Pelaksanaan</th>
+                                <th scope="col" class="px-6 py-3">Deadline</th>
+                                <th scope="col" class="px-6 py-3 text-center w-48">Sisa Hari</th>
+                                <th scope="col" class="px-6 py-3 text-center w-56">Status</th>
+                                <th scope="col" class="px-6 py-3">Info Tambahan</th>
+                                <th scope="col" class="px-6 py-3 text-center">Rilis</th>
+                                <th scope="col" class="px-6 py-3 rounded-r-lg text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-view-table-body"></tbody>
+                    </table>
+                </div>
+                <p id="no-view-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data aktif.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rekapitulasi Page (hidden by default) -->
+    <div id="rekap-page" class="hidden">
+        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+            <header class="mb-8 flex justify-between items-center">
+                <h1 id="rekap-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Rekapitulasi Data MCU</h1>
+                <div>
+                    <button id="back-to-monitoring-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                        <i data-feather="arrow-left" class="w-5 h-5"></i>
+                        <span>Kembali ke Monitoring</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Form Rekapitulasi -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                 <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-slate-800">Tambah Data Rekapitulasi</h2>
+                    <div class="flex items-center gap-2">
+                        <button id="import-rekap-btn" class="p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-100 rounded-full transition" title="Import Data dari Excel">
+                            <i data-feather="upload" class="w-6 h-6"></i>
+                        </button>
+                        <button id="view-rekap-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Tabel Rekapitulasi">
+                            <i data-feather="table" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="rekap-file-input" class="hidden" accept=".xlsx, .xls, .csv">
+                <form id="rekap-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <input type="hidden" id="rekap-edit-id">
+                    <div>
+                        <label for="rekap-nama-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Nama Perusahaan</label>
+                        <input type="text" id="rekap-nama-perusahaan" list="perusahaan-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta</label>
+                        <input type="text" id="rekap-nama-peserta" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-nik" class="block text-sm font-medium text-slate-700 mb-1">NIK</label>
+                        <input type="text" id="rekap-nik" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-usia" class="block text-sm font-medium text-slate-700 mb-1">Usia</label>
+                        <input type="number" id="rekap-usia" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-jenis-kelamin" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
+                        <select id="rekap-jenis-kelamin" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <option>Pria</option>
+                            <option>Wanita</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="rekap-hasil-kesimpulan" class="block text-sm font-medium text-slate-700 mb-1">Hasil Kesimpulan</label>
+                        <input type="text" id="rekap-hasil-kesimpulan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-status-kesehatan" class="block text-sm font-medium text-slate-700 mb-1">Status Kesehatan</label>
+                        <select id="rekap-status-kesehatan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <option>FIT</option>
+                            <option>FIT WITH NOTE RINGAN</option>
+                            <option>FIT WITH NOTE SEDANG</option>
+                            <option>FIT WITH NOTE BERAT</option>
+                            <option>TEMPORARY UNFIT</option>
+                            <option>UNFIT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="rekap-note" class="block text-sm font-medium text-slate-700 mb-1">Note</label>
+                        <input type="text" id="rekap-note" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-tgl-mcu" class="block text-sm font-medium text-slate-700 mb-1">Tgl. MCU</label>
+                        <input type="date" id="rekap-tgl-mcu" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-tgl-pengiriman" class="block text-sm font-medium text-slate-700 mb-1">Tgl. Pengiriman Hasil</label>
+                        <input type="date" id="rekap-tgl-pengiriman" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="rekap-kpi" class="block text-sm font-medium text-slate-700 mb-1">KPI (Hari)</label>
+                        <input type="text" id="rekap-kpi" class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50" readonly>
+                    </div>
+                    <div>
+                        <label for="rekap-lokasi-mcu" class="block text-sm font-medium text-slate-700 mb-1">Lokasi MCU</label>
+                        <input type="text" id="rekap-lokasi-mcu" list="klinik-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div class="md:col-span-full">
+                        <label for="rekap-ket" class="block text-sm font-medium text-slate-700 mb-1">Keterangan</label>
+                        <input type="text" id="rekap-ket" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div class="md:col-span-full flex justify-end gap-4">
+                         <button type="button" id="rekap-cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg">Batal</button>
+                        <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg flex items-center gap-2">
+                            <i data-feather="plus-circle" class="w-5 h-5"></i>
+                            <span id="rekap-submit-btn-text">Tambah Rekap</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rekap View Page (hidden by default) -->
+    <div id="rekap-view-page" class="hidden">
+        <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+            <header class="mb-8 flex justify-between items-center">
+                <h1 id="rekap-view-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Tabel Rekapitulasi</h1>
+                <button id="back-to-rekap-form-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                    <i data-feather="arrow-left" class="w-5 h-5"></i>
+                    <span>Kembali ke Input Rekap</span>
+                </button>
+            </header>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-semibold text-slate-800">Data Rekapitulasi</h2>
+                    <button id="rekap-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg flex items-center gap-2 whitespace-nowrap">
+                        <i data-feather="download" class="w-4 h-4"></i>
+                        <span>Export Rekap ke Excel</span>
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="w-full text-sm text-left text-slate-500">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                            <tr>
+                                <th class="px-6 py-3">Nama Perusahaan</th>
+                                <th class="px-6 py-3">Nama Peserta</th>
+                                <th class="px-6 py-3">Hasil</th>
+                                <th class="px-6 py-3">Tgl. MCU</th>
+                                <th class="px-6 py-3">Tgl. Kirim</th>
+                                <th class="px-6 py-3">KPI (Hari)</th>
+                                <th class="px-6 py-3">Lokasi</th>
+                                <th class="px-6 py-3">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekap-table-body"></tbody>
+                    </table>
+                </div>
+                 <p id="no-rekap-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data rekapitulasi untuk cabang ini.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals (Detail, Confirm, Rules, Report) -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800"><i data-feather="x" class="w-6 h-6"></i></button>
+            <h3 class="text-2xl font-bold mb-6 text-slate-900" id="modal-title">Detail Data MCU</h3>
+            <div id="modal-content" class="space-y-4 text-slate-700"></div>
+        </div>
+    </div>
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100"><i data-feather="alert-triangle" class="h-6 w-6 text-red-600"></i></div>
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mt-5" id="confirm-title">Hapus Data Peserta</h3>
+            <div class="mt-2"><p class="text-sm text-gray-500" id="confirm-message"></p></div>
+            <div class="mt-6 flex justify-center gap-4">
+                <button type="button" id="cancel-delete-btn" class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
+                <button type="button" id="confirm-delete-btn" class="px-6 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700">Hapus</button>
+            </div>
+        </div>
+    </div>
+    <div id="rules-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-2xl font-bold text-slate-900">Aturan dan Prosedur</h3>
+                <button id="close-rules-modal-btn" class="text-slate-500 hover:text-slate-800"><i data-feather="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 border-b">
+                <div id="tabs-container" class="flex gap-2 sm:gap-4 overflow-x-auto pb-2">
+                    <button class="tab-btn active px-4 py-2 border-b-2 font-semibold whitespace-nowrap" data-tab="release">Release Hasil</button>
+                    <button class="tab-btn px-4 py-2 border-b-2 font-semibold text-slate-500 whitespace-nowrap" data-tab="alcodrug">Alcodrug Positive</button>
+                    <button class="tab-btn px-4 py-2 border-b-2 font-semibold text-slate-500 whitespace-nowrap" data-tab="resources">Resources</button>
+                </div>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow">
+                <div id="tab-release" class="prose max-w-none">
+                     <ol class="list-decimal list-inside space-y-6">
+                        <li>
+                            <strong>Annual Macmahon</strong>
+                            <p class="mt-2"><strong>To:</strong> <a href="mailto:OH.AdminOffsite@amman.co.id" class="text-blue-600">OH.AdminOffsite@amman.co.id</a></p>
+                            <p class="mt-1"><strong>CC:</strong> <span class="text-sm text-slate-600 break-all">OH.AdminOffsite@amman.co.id; Senior.OH.Doctor@amman.co.id; OH.Doctor@amman.co.id; OH.Doctor.Offsite@amman.co.id; OH.Nurse@amman.co.id; OH.Admin@amman.co.id; Muhamad.Soebchan.Rahim@amman.co.id; Giban.Samawi@alliance.amman.co.id; Sulaiman.Sule@alliance.amman.co.id; David.Dari@alliance.amman.co.id; Medical.Service@amman.co.id;</span></p>
+                        </li>
+                        <li>
+                            <strong>Annual selain Macmahon (AMIG, AMIN, AMNT, dan subcont dengan GOP Amman)</strong>
+                            <p class="mt-2"><strong>To:</strong> Tergantung PIC peminta sesuai paket annual</p>
+                            <p class="mt-1"><strong>CC:</strong> <span class="text-sm text-slate-600 break-all">OH.AdminOffsite@amman.co.id; Senior.OH.Doctor@amman.co.id; OH.Doctor@amman.co.id; OH.Doctor.Offsite@amman.co.id; OH.Nurse@amman.co.id; OH.Admin@amman.co.id; Muhamad.Soebchan.Rahim@amman.co.id; muhammad.ilham@amman.co.id; mochammad.yoni@amman.co.id;</span></p>
+                        </li>
+                        <li>
+                            <strong>Pre Employee dan Annual paket AMMAN</strong>
+                            <p class="mt-2"><strong>To:</strong> PIC sesuai permintaan / inmo</p>
+                            <p class="mt-1"><strong>CC:</strong> <span class="text-sm text-slate-600 break-all">Senior.OH.Doctor@amman.co.id; Muhamad.Soebchan.Rahim@amman.co.id;</span></p>
+                        </li>
+                    </ol>
+                </div>
+                <div id="tab-alcodrug" class="prose max-w-none hidden">
+                    <p><strong>Untuk alcodrug test positif:</strong></p>
+                    <ul class="list-disc list-inside space-y-4 mt-4">
+                        <li><strong>PE MCU:</strong> Unfit / Reject (Biasanya akan masuk blacklist dari Perusahaan nya)</li>
+                        <li>
+                            <strong>Annual MCU:</strong> Temporary Unfit
+                            <ul class="list-['-_'] list-inside ml-6 mt-2 space-y-2">
+                                <li>Lapor ke Amman untuk investigasi (Via WA / email)</li>
+                                <li>Simpan sample urin untuk dilakukan pemeriksaan lanjutan ke Puslabfor</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p class="mt-6"><strong>Untuk pengiriman sample urin:</strong></p>
+                    <ol class="list-decimal list-inside space-y-2 mt-4">
+                        <li>Jika temuan di Tirta Medical Maluk, kirim ke klinik Amman (BBC)</li>
+                        <li>Jika temuan di Mataram, dapat langsung mengirimkan ke puslabfor Mataram (setelah kordinasi dengan Amman)</li>
+                        <li>Jika temuan diluar itu, mohon kordinasi dahulu dengan kami</li>
+                    </ol>
+                </div>
+                 <div id="tab-resources" class="prose max-w-none hidden">
+                    <ol class="list-decimal list-inside space-y-4">
+                        <li>
+                            <a href="https://drive.google.com/file/d/1eLNWO3ezabQ5WU32NOnZN6DD9tCQaQ0A/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                                CDC-HRD-000-G014 Panduan Penentuan Jenis-Jenis Pemeriksaan Kesehatan Pra-Kerja
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://drive.google.com/file/d/1_8KasDbvYPbln4zqdz2RlXgHZ4qDvWXa/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                                CDC-HRD-000-G013 Panduan Penentuan Jenis-Jenis Pemeriksaan Kesehatan Berkala Tahunan Karyawan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://docs.google.com/spreadsheets/d/1KpfUzOT09m7_GTcXm2YZdPOk_s0fV395/edit?usp=drive_link&ouid=110969360569017744151&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                                (MCU PREEMPLOYEE) 20230423.Ver Indo.Kriteria Fit to work MCU ON SITE DAN EXTERNAL AMMAN FINAL
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://docs.google.com/spreadsheets/d/1zsqxkY05NV89uAgK8gLEPel8ulrvFxQ4/edit?usp=drive_link&ouid=110969360569017744151&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                                (MCU PERIODIC) Kriteria Fit to work MCU ON SITE DAN EXTERNAL AMMAN FINAL.rev 21.3.2023
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Branch Selection Modal -->
+    <div id="branch-selection-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-2xl font-bold text-slate-900">Pilih Cabang untuk Rekapitulasi</h3>
+                <button id="close-branch-modal-btn" class="text-slate-500 hover:text-slate-800">
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="branch-list-container" class="p-8 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Branch buttons will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Date Range Modal -->
+    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900" id="confirm-title">Pilih Periode Laporan</h3>
+            <div class="mt-4 grid grid-cols-1 gap-4">
+                 <div>
+                    <label for="start-date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Mulai</label>
+                    <input type="date" id="start-date" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label for="end-date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Selesai</label>
+                    <input type="date" id="end-date" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-4">
+                <button type="button" id="cancel-report-btn" class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
+                <button type="button" id="confirm-report-btn" class="px-6 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-lg hover:bg-green-700">Buat Laporan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+            <div id="info-modal-icon-container" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                <!-- Icon will be inserted here -->
+            </div>
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mt-5" id="info-modal-title"></h3>
+            <div class="mt-2"><p class="text-sm text-gray-500" id="info-modal-message"></p></div>
+            <div class="mt-6 flex justify-center gap-4">
+                <button type="button" id="info-modal-close-btn" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA APLIKASI -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+      
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // =================================================================================
+            // PASTE KONFIGURASI FIREBASE ANDA DI SINI
+            // =================================================================================
+            const firebaseConfig = {
+                // apiKey: "AIzaSyA20m4mQki6Kkpz0Z-wVUwzF4O08VEYOQg",
+                // authDomain: "mcu-monitoring.firebaseapp.com",
+                // projectId: "mcu-monitoring",
+                // storageBucket: "mcu-monitoring.firebasestorage.app",
+                // messagingSenderId: "657976635162",
+                // appId: "1:657976635162:web:1f2772ddea1c7093b9c6a3"
+            };
+            // =================================================================================
+            
+            // --- Cek apakah Firebase config sudah diisi ---
+            if (!firebaseConfig.apiKey) {
+                console.warn("Konfigurasi Firebase belum diisi. Aplikasi akan berjalan dalam mode offline.");
+            }
+            
+            // --- Inisialisasi Firebase (hanya jika config ada) ---
+            let app, auth, db;
+            if (firebaseConfig.apiKey) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // --- Autentikasi ---
+                (async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Firebase Auth Error:", error);
+                        alert("Gagal melakukan autentikasi ke Firebase: " + error.message);
+                    }
+                })();
+
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        console.log("User terautentikasi (Firebase).");
+                        window.dispatchEvent(new CustomEvent('firebase-auth-ready'));
+                    }
+                });
+            }
+
+
+            // --- SHARED ELEMENTS & DATA ---
+            const klinikList = document.getElementById('klinik-list');
+            const perusahaanList = document.getElementById('perusahaan-list');
+            const cabangKlinikOptions = ["Angsana", "Bali", "Balikpapan", "Banjarmasin", "Batu Sopang", "Berau Derawan", "Berau Pemuda", "Bogor", "BSD", "Cibinong", "Cikande", "Jakarta", "Karawang", "Luwuk", "Makassar", "Maluk", "Manado", "Mataram", "Medan", "Melak", "Morowali", "Muara Teweh", "Palembang", "Pekanbaru", "Samarinda", "Sangatta", "Semarang", "Sorong", "Surabaya", "Tambun", "Tanjung Tabalong", "Ternate", "Yogyakarta"];
+            cabangKlinikOptions.forEach(cabang => {
+                const option = document.createElement('option');
+                option.value = cabang;
+                klinikList.appendChild(option);
+            });
+
+            // --- PAGE SWITCHING LOGIC ---
+            const monitoringPage = document.getElementById('monitoring-page');
+            const dataViewPage = document.getElementById('data-view-page');
+            const rekapPage = document.getElementById('rekap-page');
+            const rekapViewPage = document.getElementById('rekap-view-page');
+            
+            const goToRekapBtn = document.getElementById('rekap-btn');
+            const goToDataViewBtn = document.getElementById('view-data-btn');
+
+            const backToMonitoringBtn = document.getElementById('back-to-monitoring-btn');
+            const backToMonitoringFromViewBtn = document.getElementById('back-to-monitoring-from-view-btn');
+
+            const branchSelectionModal = document.getElementById('branch-selection-modal');
+            const closeBranchModalBtn = document.getElementById('close-branch-modal-btn');
+            const branchListContainer = document.getElementById('branch-list-container');
+            const rekapHeaderTitle = document.getElementById('rekap-header-title');
+
+            let currentRekapBranch = null;
+
+            cabangKlinikOptions.sort().forEach(branch => {
+                const button = document.createElement('button');
+                button.className = 'branch-button w-full text-left p-4 bg-slate-100 hover:bg-blue-100 hover:text-blue-700 rounded-lg font-semibold';
+                button.textContent = branch;
+                button.dataset.branch = branch;
+                branchListContainer.appendChild(button);
+            });
+
+            goToDataViewBtn.addEventListener('click', () => {
+                monitoringPage.classList.add('hidden');
+                dataViewPage.classList.remove('hidden');
+                window.dispatchEvent(new CustomEvent('renderDataView'));
+                feather.replace();
+            });
+
+            goToRekapBtn.addEventListener('click', () => {
+                branchSelectionModal.classList.remove('hidden');
+                branchSelectionModal.classList.add('flex');
+            });
+            
+            closeBranchModalBtn.addEventListener('click', () => {
+                 branchSelectionModal.classList.add('hidden');
+                branchSelectionModal.classList.remove('flex');
+            });
+
+            branchListContainer.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    currentRekapBranch = e.target.dataset.branch;
+                    rekapHeaderTitle.textContent = `Input Rekapitulasi - ${currentRekapBranch}`;
+                    
+                    branchSelectionModal.classList.add('hidden');
+                    branchSelectionModal.classList.remove('flex');
+                    monitoringPage.classList.add('hidden');
+                    dataViewPage.classList.add('hidden');
+                    rekapPage.classList.remove('hidden');
+                    
+                    window.dispatchEvent(new CustomEvent('branchSelected'));
+                    feather.replace();
+                }
+            });
+
+            backToMonitoringBtn.addEventListener('click', () => {
+                rekapPage.classList.add('hidden');
+                rekapViewPage.classList.add('hidden');
+                monitoringPage.classList.remove('hidden');
+                currentRekapBranch = null;
+                feather.replace();
+            });
+
+            backToMonitoringFromViewBtn.addEventListener('click', () => {
+                dataViewPage.classList.add('hidden');
+                monitoringPage.classList.remove('hidden');
+                feather.replace();
+            });
+
+            // --- INFO MODAL SCRIPT ---
+            const infoModal = document.getElementById('info-modal');
+            const infoModalTitle = document.getElementById('info-modal-title');
+            const infoModalMessage = document.getElementById('info-modal-message');
+            const infoModalCloseBtn = document.getElementById('info-modal-close-btn');
+            const infoModalIconContainer = document.getElementById('info-modal-icon-container');
+
+            function showInfoModal(title, message, type = 'success') {
+                infoModalTitle.textContent = title;
+                infoModalMessage.textContent = message;
+                
+                infoModalIconContainer.innerHTML = ''; // Clear previous icon
+                if (type === 'success') {
+                    infoModalIconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100';
+                    infoModalIconContainer.innerHTML = '<i data-feather="check" class="h-6 w-6 text-green-600"></i>';
+                } else { // error
+                    infoModalIconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100';
+                    infoModalIconContainer.innerHTML = '<i data-feather="alert-triangle" class="h-6 w-6 text-red-600"></i>';
+                }
+                
+                infoModal.classList.remove('hidden');
+                infoModal.classList.add('flex');
+                feather.replace();
+            }
+
+            function hideInfoModal() {
+                 infoModal.classList.add('hidden');
+                infoModal.classList.remove('flex');
+            }
+
+            infoModalCloseBtn.addEventListener('click', hideInfoModal);
+            infoModal.addEventListener('click', (e) => { if (e.target === infoModal) hideInfoModal(); });
+
+
+            // --- MONITORING & VIEW PAGE SCRIPT ---
+            const monitoringScript = () => {
+                const form = document.getElementById('mcu-form');
+                const editIdInput = document.getElementById('edit-id');
+                const formTitle = document.getElementById('form-title');
+                const submitBtn = document.getElementById('submit-btn');
+                const submitBtnText = document.getElementById('submit-btn-text');
+                const cancelEditBtn = document.getElementById('cancel-edit-btn');
+                const dataFormContainer = document.getElementById('data-form-container');
+                const detailModal = document.getElementById('detail-modal');
+                const closeModalBtn = document.getElementById('close-modal-btn');
+                const modalContent = document.getElementById('modal-content');
+                const modalTitle = document.getElementById('modal-title');
+                const tanggalPelaksanaanInput = document.getElementById('tanggal-pelaksanaan');
+                const tanggalDeadlineInput = document.getElementById('tanggal-deadline');
+                const emailList = document.getElementById('email-list');
+                const confirmModal = document.getElementById('confirm-modal');
+                const confirmMessage = document.getElementById('confirm-message');
+                const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+                const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+                const rulesBtn = document.getElementById('rules-btn');
+                const rulesModal = document.getElementById('rules-modal');
+                const closeRulesModalBtn = document.getElementById('close-rules-modal-btn');
+                const tabsContainer = document.getElementById('tabs-container');
+                const dataViewTableBody = document.getElementById('data-view-table-body');
+                const noViewDataMessage = document.getElementById('no-view-data-message');
+                const viewSearchInput = document.getElementById('view-search-input');
+                const viewExportBtn = document.getElementById('view-export-btn');
+
+                let mcuData = [];
+                let unsubscribeMonitoring;
+
+                const populateDatalists = () => {
+                    const uniquePerusahaan = [...new Set(mcuData.map(item => item.asalPerusahaan).filter(Boolean))];
+                    const uniqueEmail = [...new Set(mcuData.map(item => item.emailTujuan).filter(Boolean))];
+                    perusahaanList.innerHTML = '';
+                    uniquePerusahaan.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p;
+                        perusahaanList.appendChild(option);
+                    });
+                    emailList.innerHTML = '';
+                    uniqueEmail.forEach(e => {
+                        const option = document.createElement('option');
+                        option.value = e;
+                        emailList.appendChild(option);
+                    });
+                };
+
+                const calculateSisaHari = (deadlineDate, status) => {
+                    if (!deadlineDate || status === 'Released' || status === 'Cancelled') return '-';
+                    const today = new Date();
+                    const deadline = new Date(deadlineDate);
+                    today.setHours(0, 0, 0, 0);
+                    deadline.setHours(0, 0, 0, 0);
+                    const diffTime = deadline.getTime() - today.getTime();
+                    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                };
+
+                const renderDataViewTable = (data = mcuData) => {
+                    dataViewTableBody.innerHTML = '';
+                    const dataToDisplay = data.filter(item => item.status !== 'Released');
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
+                    if (dataToDisplay.length === 0) return;
+
+                    const groupedData = dataToDisplay.reduce((acc, item) => {
+                        const branch = item.cabangKlinik || 'Tanpa Cabang';
+                        if (!acc[branch]) acc[branch] = [];
+                        acc[branch].push(item);
+                        return acc;
+                    }, {});
+
+                    const sortedBranches = Object.keys(groupedData).sort();
+
+                    sortedBranches.forEach(branch => {
+                        const headerRow = document.createElement('tr');
+                        headerRow.className = 'bg-slate-200 sticky top-0 z-10';
+                        headerRow.innerHTML = `<td colspan="12" class="px-6 py-3 font-bold text-slate-800 text-base">${branch.toUpperCase()}</td>`;
+                        dataViewTableBody.appendChild(headerRow);
+
+                        const branchItems = groupedData[branch];
+                        branchItems.forEach(item => {
+                            const sisaHari = calculateSisaHari(item.tanggalDeadline, item.status);
+                            let sisaHariClass = 'bg-slate-100 text-slate-800', sisaHariText = `${sisaHari} hari`;
+                            if (sisaHari === '-') { sisaHariClass = 'bg-gray-100 text-gray-500'; sisaHariText = '-'; } 
+                            else if (sisaHari < 0) { sisaHariClass = 'bg-red-100 text-red-800'; sisaHariText = 'Terlewat'; } 
+                            else if (sisaHari <= 3) { sisaHariClass = 'bg-yellow-100 text-yellow-800'; } 
+                            else if (sisaHari <= 7) { sisaHariClass = 'bg-blue-100 text-blue-800'; }
+                            
+                            let emailContent = item.emailTujuan;
+                            if (emailContent.length > 25) { emailContent = `<span title="${item.emailTujuan}">${emailContent.substring(0, 25)}...</span>`; }
+
+                            let spContent = item.suratPengantar || '-';
+                            if (item.suratPengantar && item.suratPengantar.toUpperCase() === 'MENYUSUL') {
+                                spContent = '<strong class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">MENYUSUL</strong>';
+                            } else {
+                                const isUrl = /^(https?:\/\/|www\.)/i.test(item.suratPengantar);
+                                if (isUrl) {
+                                    const fullUrl = item.suratPengantar.startsWith('www.') ? `http://${item.suratPengantar}` : item.suratPengantar;
+                                    spContent = `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline flex items-center gap-1"><span>Buka Link</span><i data-feather="external-link" class="w-3 h-3"></i></a>`;
+                                } else if (spContent.length > 20) {
+                                    spContent = `<span title="${item.suratPengantar}">${spContent.substring(0, 20)}...</span>`;
+                                }
+                            }
+                            
+                            const row = document.createElement('tr');
+                            const isCompleted = item.status === 'Cancelled';
+                            row.className = `bg-white border-b transition-all duration-300 ${isCompleted ? 'greyed-out' : 'hover:bg-slate-50'}`;
+                            
+                            row.innerHTML = `
+                                <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">${item.namaPeserta}</td>
+                                <td class="px-6 py-4">${item.asalPerusahaan}</td>
+                                <td class="px-6 py-4">${spContent}</td>
+                                <td class="px-6 py-4">${emailContent}</td>
+                                <td class="px-6 py-4">${new Date(item.tanggalPelaksanaan).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                <td class="px-6 py-4">${new Date(item.tanggalDeadline).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                <td class="px-6 py-4 text-center"><span class="px-2 py-1 text-xs font-medium rounded-full ${sisaHariClass}">${sisaHariText}</span></td>
+                                <td class="px-6 py-4 text-center">
+                                    <select class="status-select w-full bg-transparent" data-id="${item.id}">
+                                        <option value="Pending" ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="On Process" ${item.status === 'On Process' ? 'selected' : ''}>On Process</option>
+                                        <option value="Released" ${item.status === 'Released' ? 'selected' : ''}>Released</option>
+                                        <option value="Cancelled" ${item.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <input type="text" class="info-input w-full bg-transparent" value="${item.info || ''}" placeholder="-" data-id="${item.id}">
+                                </td>
+                                <td class="px-6 py-4 text-center"><input type="checkbox" class="release-checkbox h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" data-id="${item.id}" ${item.status === 'Released' ? 'checked' : ''} ${item.status === 'Cancelled' ? 'disabled' : ''}></td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button class="view-btn p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full transition" data-id="${item.id}" title="Lihat Detail"><i data-feather="eye" class="w-4 h-4"></i></button>
+                                        <button class="edit-btn p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full transition" data-id="${item.id}" title="Ubah Data"><i data-feather="edit-2" class="w-4 h-4"></i></button>
+                                        <button class="delete-btn p-2 text-slate-500 hover:text-red-600 hover:bg-red-100 rounded-full transition" data-id="${item.id}" title="Hapus Data"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                                    </div>
+                                </td>
+                            `;
+                            dataViewTableBody.appendChild(row);
+                        });
+                    });
+
+                    feather.replace();
+                };
+                
+                const resetForm = () => {
+                    form.reset();
+                    editIdInput.value = '';
+                    formTitle.textContent = 'Tambah Data Peserta MCU Baru';
+                    submitBtnText.textContent = 'Tambah Data';
+                    const icon = submitBtn.querySelector('i') || submitBtn.querySelector('svg');
+                    if (icon) icon.outerHTML = '<i data-feather="plus-circle" class="w-5 h-5"></i>';
+                    feather.replace();
+                    cancelEditBtn.classList.add('hidden');
+                    dataFormContainer.classList.remove('editing-mode');
+                };
+
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = {
+                        namaPeserta: document.getElementById('nama-peserta').value,
+                        asalPerusahaan: document.getElementById('asal-perusahaan').value,
+                        suratPengantar: document.getElementById('surat-pengantar').value,
+                        emailTujuan: document.getElementById('email-tujuan').value,
+                        tanggalPelaksanaan: document.getElementById('tanggal-pelaksanaan').value,
+                        tanggalDeadline: document.getElementById('tanggal-deadline').value,
+                        status: document.getElementById('status').value,
+                        cabangKlinik: document.getElementById('cabang-klinik').value,
+                        info: '',
+                    };
+                    const editId = editIdInput.value;
+                    const mcuCollectionRef = collection(db, `artifacts/${appId}/public/data/monitoring_mcu`);
+                    
+                    if (editId) {
+                        const docRef = doc(db, `artifacts/${appId}/public/data/monitoring_mcu`, editId);
+                        await updateDoc(docRef, formData);
+                    } else {
+                        await addDoc(mcuCollectionRef, formData);
+                    }
+                    resetForm();
+                });
+
+                dataViewTableBody.addEventListener('change', async (e) => {
+                    const target = e.target;
+                    const id = target.dataset.id;
+                    if (!id) return;
+                    const docRef = doc(db, `artifacts/${appId}/public/data/monitoring_mcu`, id);
+
+                    if (target.classList.contains('status-select')) {
+                        await updateDoc(docRef, { status: target.value });
+                    } else if (target.classList.contains('release-checkbox')) {
+                        await updateDoc(docRef, { status: target.checked ? 'Released' : 'On Process' });
+                    }
+                });
+
+                dataViewTableBody.addEventListener('input', async (e) => {
+                    if (e.target.classList.contains('info-input')) {
+                        const id = e.target.dataset.id;
+                        if (!id) return;
+                        const docRef = doc(db, `artifacts/${appId}/public/data/monitoring_mcu`, id);
+                        await updateDoc(docRef, { info: e.target.value });
+                    }
+                });
+
+                dataViewTableBody.addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (!button) return;
+                    const id = button.dataset.id;
+                    const item = mcuData.find(d => d.id === id);
+                    if (!item) return;
+                    
+                    if (button.classList.contains('edit-btn')) {
+                        document.getElementById('nama-peserta').value = item.namaPeserta;
+                        document.getElementById('asal-perusahaan').value = item.asalPerusahaan;
+                        document.getElementById('surat-pengantar').value = item.suratPengantar;
+                        document.getElementById('email-tujuan').value = item.emailTujuan;
+                        document.getElementById('tanggal-pelaksanaan').value = item.tanggalPelaksanaan;
+                        document.getElementById('tanggal-deadline').value = item.tanggalDeadline;
+                        document.getElementById('status').value = item.status;
+                        document.getElementById('cabang-klinik').value = item.cabangKlinik;
+                        editIdInput.value = id;
+                        formTitle.textContent = 'Ubah Data Peserta MCU';
+                        submitBtnText.textContent = 'Simpan Perubahan';
+                        const icon = submitBtn.querySelector('i') || submitBtn.querySelector('svg');
+                        if (icon) icon.outerHTML = '<i data-feather="save" class="w-5 h-5"></i>';
+                        feather.replace();
+                        cancelEditBtn.classList.remove('hidden');
+                        dataFormContainer.classList.add('editing-mode');
+                        
+                        dataViewPage.classList.add('hidden');
+                        monitoringPage.classList.remove('hidden');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    if (button.classList.contains('delete-btn')) {
+                        confirmMessage.innerHTML = `Apakah Anda yakin ingin menghapus data untuk <strong>${item.namaPeserta}</strong>? Tindakan ini tidak dapat dibatalkan.`;
+                        confirmModal.dataset.deleteId = id;
+                        confirmModal.classList.remove('hidden');
+                        confirmModal.classList.add('flex');
+                        feather.replace();
+                    }
+                    if (button.classList.contains('view-btn')) {
+                         let spModalContent = item.suratPengantar || '-';
+                        if (/^(https?:\/\/|www\.)/i.test(item.suratPengantar)) {
+                            const fullUrl = item.suratPengantar.startsWith('www.') ? `http://${item.suratPengantar}` : item.suratPengantar;
+                            spModalContent = `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">${item.suratPengantar}</a>`;
+                        }
+                        modalTitle.textContent = `Detail MCU: ${item.namaPeserta}`;
+                        modalContent.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4"><div><strong>Asal Perusahaan:</strong> <p class="text-slate-600">${item.asalPerusahaan}</p></div><div><strong>Surat Pengantar:</strong> <div class="text-slate-600">${spModalContent}</div></div><div><strong>Email Tujuan:</strong> <p class="text-slate-600">${item.emailTujuan}</p></div><div><strong>Cabang Klinik:</strong> <p class="text-slate-600">${item.cabangKlinik}</p></div><div><strong>Tgl Pelaksanaan:</strong> <p class="text-slate-600">${new Date(item.tanggalPelaksanaan).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p></div><div><strong>Deadline Hasil:</strong> <p class="text-slate-600">${new Date(item.tanggalDeadline).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p></div><div><strong>Status:</strong> <p class="text-slate-600">${item.status}</p></div><div class="sm:col-span-2"><strong>Info Tambahan:</strong> <p class="text-slate-600">${item.info || '-'}</p></div></div>`;
+                        detailModal.classList.add('flex');
+                        detailModal.classList.remove('hidden');
+                    }
+                });
+                
+                function hideConfirmModal() {
+                    confirmModal.classList.add('hidden');
+                    confirmModal.classList.remove('flex');
+                    delete confirmModal.dataset.deleteId;
+                }
+
+                confirmDeleteBtn.addEventListener('click', async () => {
+                    const idToDelete = confirmModal.dataset.deleteId;
+                    if (idToDelete) {
+                        await deleteDoc(doc(db, `artifacts/${appId}/public/data/monitoring_mcu`, idToDelete));
+                        hideConfirmModal();
+                    }
+                });
+
+                cancelDeleteBtn.addEventListener('click', hideConfirmModal);
+                confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirmModal(); });
+                cancelEditBtn.addEventListener('click', resetForm);
+                
+                const closeModal = () => {
+                    detailModal.classList.add('hidden');
+                    detailModal.classList.remove('flex');
+                };
+                closeModalBtn.addEventListener('click', closeModal);
+                detailModal.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirmModal(); });
+
+                tanggalPelaksanaanInput.addEventListener('change', () => {
+                    const pelaksanaanDate = tanggalPelaksanaanInput.value;
+                    if (pelaksanaanDate) {
+                        const date = new Date(pelaksanaanDate);
+                        date.setDate(date.getDate() + 2);
+                        tanggalDeadlineInput.value = date.toISOString().split('T')[0];
+                    }
+                });
+
+                rulesBtn.addEventListener('click', () => {
+                    rulesModal.classList.remove('hidden');
+                    rulesModal.classList.add('flex');
+                    feather.replace();
+                });
+                closeRulesModalBtn.addEventListener('click', () => {
+                    rulesModal.classList.add('hidden');
+                    rulesModal.classList.remove('flex');
+                });
+                tabsContainer.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tab-btn')) {
+                        const tabId = e.target.dataset.tab;
+                        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        document.querySelectorAll('#rules-modal .prose').forEach(content => content.classList.add('hidden'));
+                        document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+                    }
+                });
+
+                const exportToExcel = () => {
+                     const dataToExport = mcuData.map(item => {
+                        const sisaHari = calculateSisaHari(item.tanggalDeadline, item.status);
+                        let sisaHariText = sisaHari;
+                        if (typeof sisaHari === 'number') {
+                            if (sisaHari < 0) sisaHariText = 'Terlewat'; else sisaHariText = `${sisaHari} hari`;
+                        }
+                        return [
+                            item.namaPeserta, item.asalPerusahaan, item.suratPengantar, item.emailTujuan, 
+                            new Date(item.tanggalPelaksanaan).toLocaleDateString('id-ID'), 
+                            new Date(item.tanggalDeadline).toLocaleDateString('id-ID'),
+                            item.status, sisaHariText, item.cabangKlinik, item.info || ''
+                        ];
+                    });
+                    if (dataToExport.length === 0) return;
+                    const title = "Laporan Monitoring Pelaksanaan MCU PT Amman";
+                    const headers = ['Nama Peserta', 'Asal Perusahaan', 'Surat Pengantar (SP)', 'Email Tujuan', 'Tanggal Pelaksanaan', 'Tanggal Deadline', 'Status', 'Sisa Hari', 'Cabang Klinik', 'Info Tambahan'];
+                    const worksheetData = [[title], [], headers].concat(dataToExport);
+                    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+                    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }];
+                    if(worksheet['A1']) worksheet['A1'].s = { font: { bold: true, sz: 16 }, alignment: { horizontal: "center" } };
+                    headers.forEach((_, i) => {
+                        const cellRef = XLSX.utils.encode_cell({c: i, r: 2});
+                        if(worksheet[cellRef]) worksheet[cellRef].s = { font: { bold: true } };
+                    });
+                    const colWidths = headers.map((_, i) => ({ wch: Math.max(...worksheetData.map(row => row[i] ? row[i].toString().length : 0)) + 5 }));
+                    worksheet["!cols"] = colWidths;
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data MCU');
+                    const today = new Date().toISOString().slice(0, 10);
+                    XLSX.writeFile(workbook, `Laporan_MCU_PT_Amman_${today}.xlsx`);
+                };
+                
+                viewExportBtn.addEventListener('click', exportToExcel);
+
+                viewSearchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredData = mcuData.filter(item => item.namaPeserta.toLowerCase().includes(searchTerm) || item.asalPerusahaan.toLowerCase().includes(searchTerm));
+                    renderDataViewTable(filteredData);
+                });
+
+                window.addEventListener('renderDataView', () => renderDataViewTable());
+                
+                function listenToMonitoringData() {
+                    if (unsubscribeMonitoring) unsubscribeMonitoring();
+                    const q = query(collection(db, `artifacts/${appId}/public/data/monitoring_mcu`), orderBy("tanggalPelaksanaan"));
+                    unsubscribeMonitoring = onSnapshot(q, (snapshot) => {
+                        mcuData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                        populateDatalists();
+                        if (!dataViewPage.classList.contains('hidden')) {
+                            renderDataViewTable();
+                        }
+                    });
+                }
+                
+                if (firebaseConfig.apiKey) {
+                    window.addEventListener('firebase-auth-ready', listenToMonitoringData);
+                }
+
+                feather.replace();
+            };
+
+            // --- REKAPITULASI PAGE SCRIPT ---
+            const rekapScript = () => {
+                const rekapForm = document.getElementById('rekap-form');
+                const rekapTableBody = document.getElementById('rekap-table-body');
+                const noRekapDataMessage = document.getElementById('no-rekap-data-message');
+                const rekapEditIdInput = document.getElementById('rekap-edit-id');
+                const rekapSubmitBtnText = document.getElementById('rekap-submit-btn-text');
+                const rekapCancelEditBtn = document.getElementById('rekap-cancel-edit-btn');
+                const rekapTglMcu = document.getElementById('rekap-tgl-mcu');
+                const rekapTglPengiriman = document.getElementById('rekap-tgl-pengiriman');
+                const rekapKpi = document.getElementById('rekap-kpi');
+                const rekapExportBtn = document.getElementById('rekap-export-btn');
+                const viewRekapBtn = document.getElementById('view-rekap-btn');
+                const rekapViewPage = document.getElementById('rekap-view-page');
+                const backToRekapFormBtn = document.getElementById('back-to-rekap-form-btn');
+                const rekapViewHeaderTitle = document.getElementById('rekap-view-header-title');
+                const importRekapBtn = document.getElementById('import-rekap-btn');
+                const rekapFileInput = document.getElementById('rekap-file-input');
+
+                let currentRekapData = [];
+                let unsubscribeRekap;
+
+                viewRekapBtn.addEventListener('click', () => {
+                    rekapPage.classList.add('hidden');
+                    rekapViewPage.classList.remove('hidden');
+                    rekapViewHeaderTitle.textContent = `Tabel Rekapitulasi - ${currentRekapBranch}`;
+                    renderRekapTable();
+                    feather.replace();
+                });
+
+                backToRekapFormBtn.addEventListener('click', () => {
+                    rekapViewPage.classList.add('hidden');
+                    rekapPage.classList.remove('hidden');
+                    feather.replace();
+                });
+                
+                const calculateKpi = (tglMcu, tglKirim) => {
+                    if (!tglMcu || !tglKirim) return '';
+                    const startDate = new Date(tglMcu);
+                    const endDate = new Date(tglKirim);
+                    const diffTime = endDate - startDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays >= 0 ? diffDays : '';
+                };
+
+                const renderRekapTable = () => {
+                    if (!currentRekapBranch) return;
+                    
+                    rekapTableBody.innerHTML = '';
+                    noRekapDataMessage.classList.toggle('hidden', currentRekapData.length === 0);
+                    currentRekapData.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.className = 'bg-white border-b hover:bg-slate-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4">${item.namaPerusahaan}</td>
+                            <td class="px-6 py-4 font-medium text-slate-900">${item.namaPeserta}</td>
+                            <td class="px-6 py-4">${item.hasilKesimpulan}</td>
+                            <td class="px-6 py-4">${new Date(item.tglMcu).toLocaleDateString('id-ID')}</td>
+                            <td class="px-6 py-4">${new Date(item.tglPengiriman).toLocaleDateString('id-ID')}</td>
+                            <td class="px-6 py-4">${item.kpi}</td>
+                            <td class="px-6 py-4">${item.lokasiMcu}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="rekap-edit-btn p-2 text-slate-500 hover:text-green-600 rounded-full" data-id="${item.id}"><i data-feather="edit-2" class="w-4 h-4"></i></button>
+                                    <button class="rekap-delete-btn p-2 text-slate-500 hover:text-red-600 rounded-full" data-id="${item.id}"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                                </div>
+                            </td>
+                        `;
+                        rekapTableBody.appendChild(row);
+                    });
+                    feather.replace();
+                };
+                
+                const resetRekapForm = () => {
+                    rekapForm.reset();
+                    rekapEditIdInput.value = '';
+                    rekapSubmitBtnText.textContent = 'Tambah Rekap';
+                    rekapCancelEditBtn.classList.add('hidden');
+                };
+
+                rekapForm.addEventListener('submit', async e => {
+                    e.preventDefault();
+                    if (!currentRekapBranch) return;
+                    const rekapCollectionRef = collection(db, `artifacts/${appId}/public/data/rekapitulasi/${currentRekapBranch}/data`);
+                    
+                    const formData = {
+                        namaPerusahaan: document.getElementById('rekap-nama-perusahaan').value,
+                        namaPeserta: document.getElementById('rekap-nama-peserta').value,
+                        nik: document.getElementById('rekap-nik').value,
+                        usia: document.getElementById('rekap-usia').value,
+                        jenisKelamin: document.getElementById('rekap-jenis-kelamin').value,
+                        hasilKesimpulan: document.getElementById('rekap-hasil-kesimpulan').value,
+                        statusKesehatan: document.getElementById('rekap-status-kesehatan').value,
+                        note: document.getElementById('rekap-note').value,
+                        tglMcu: document.getElementById('rekap-tgl-mcu').value,
+                        tglPengiriman: document.getElementById('rekap-tgl-pengiriman').value,
+                        kpi: document.getElementById('rekap-kpi').value,
+                        lokasiMcu: document.getElementById('rekap-lokasi-mcu').value,
+                        ket: document.getElementById('rekap-ket').value,
+                    };
+
+                    const editId = rekapEditIdInput.value;
+                    if (editId) {
+                        await updateDoc(doc(rekapCollectionRef, editId), formData);
+                    } else {
+                        await addDoc(rekapCollectionRef, formData);
+                    }
+                    resetRekapForm();
+                });
+
+                rekapTableBody.addEventListener('click', async e => {
+                    const button = e.target.closest('button');
+                    if (!button || !currentRekapBranch) return;
+                    const id = button.dataset.id;
+                    const item = currentRekapData.find(d => d.id === id);
+
+                    if (button.classList.contains('rekap-edit-btn')) {
+                        document.getElementById('rekap-nama-perusahaan').value = item.namaPerusahaan;
+                        document.getElementById('rekap-nama-peserta').value = item.namaPeserta;
+                        document.getElementById('rekap-nik').value = item.nik;
+                        document.getElementById('rekap-usia').value = item.usia;
+                        document.getElementById('rekap-jenis-kelamin').value = item.jenisKelamin;
+                        document.getElementById('rekap-hasil-kesimpulan').value = item.hasilKesimpulan;
+                        document.getElementById('rekap-status-kesehatan').value = item.statusKesehatan;
+                        document.getElementById('rekap-note').value = item.note;
+                        document.getElementById('rekap-tgl-mcu').value = item.tglMcu;
+                        document.getElementById('rekap-tgl-pengiriman').value = item.tglPengiriman;
+                        document.getElementById('rekap-kpi').value = item.kpi;
+                        document.getElementById('rekap-lokasi-mcu').value = item.lokasiMcu;
+                        document.getElementById('rekap-ket').value = item.ket;
+                        rekapEditIdInput.value = id;
+                        rekapSubmitBtnText.textContent = 'Simpan Perubahan';
+                        rekapCancelEditBtn.classList.remove('hidden');
+                        
+                        rekapViewPage.classList.add('hidden');
+                        rekapPage.classList.remove('hidden');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+
+                    if (button.classList.contains('rekap-delete-btn')) {
+                         const rekapCollectionRef = collection(db, `artifacts/${appId}/public/data/rekapitulasi/${currentRekapBranch}/data`);
+                         await deleteDoc(doc(rekapCollectionRef, id));
+                    }
+                });
+
+                rekapCancelEditBtn.addEventListener('click', resetRekapForm);
+                
+                [rekapTglMcu, rekapTglPengiriman].forEach(el => {
+                    el.addEventListener('change', () => {
+                        rekapKpi.value = calculateKpi(rekapTglMcu.value, rekapTglPengiriman.value);
+                    });
+                });
+
+                importRekapBtn.addEventListener('click', () => {
+                    rekapFileInput.click();
+                });
+
+                rekapFileInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (!file || !currentRekapBranch) return;
+
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                            const sheetName = workbook.SheetNames[0];
+                            const worksheet = workbook.Sheets[sheetName];
+                            const importedData = XLSX.utils.sheet_to_json(worksheet);
+
+                            if (importedData.length === 0) {
+                                showInfoModal('Gagal', 'File Excel kosong atau tidak memiliki data.', 'error');
+                                return;
+                            }
+                            
+                            const headerMapping = {
+                                'NAMA PERUSAHAAN': 'namaPerusahaan', 'NAMA PESERTA': 'namaPeserta', 'NIK': 'nik',
+                                'USIA': 'usia', 'JENIS KELAMIN': 'jenisKelamin', 'HASIL KESIMPULAN': 'hasilKesimpulan',
+                                'STATUS KESEHATAN': 'statusKesehatan', 'NOTE': 'note', 'TGL. MCU': 'tglMcu',
+                                'TGL. PENGIRIMAN HASIL': 'tglPengiriman', 'LOKASI MCU': 'lokasiMcu', 'KET.': 'ket'
+                            };
+                            
+                            const newRecords = importedData.map(row => {
+                                const newRecord = {};
+                                for (const excelHeader in headerMapping) {
+                                    const objectKey = headerMapping[excelHeader];
+                                    newRecord[objectKey] = row[excelHeader] !== undefined ? row[excelHeader] : '';
+                                }
+                                if (newRecord.tglMcu instanceof Date) newRecord.tglMcu = newRecord.tglMcu.toISOString().split('T')[0];
+                                if (newRecord.tglPengiriman instanceof Date) newRecord.tglPengiriman = newRecord.tglPengiriman.toISOString().split('T')[0];
+                                newRecord.kpi = calculateKpi(newRecord.tglMcu, newRecord.tglPengiriman);
+                                return newRecord;
+                            }).filter(record => record.namaPeserta);
+
+                            const rekapCollectionRef = collection(db, `artifacts/${appId}/public/data/rekapitulasi/${currentRekapBranch}/data`);
+                            for (const record of newRecords) {
+                                await addDoc(rekapCollectionRef, record);
+                            }
+                            
+                            showInfoModal('Sukses', `${newRecords.length} data berhasil diimpor ke cabang ${currentRekapBranch}.`, 'success');
+
+                        } catch (error) {
+                            console.error("Error importing Excel file:", error);
+                            showInfoModal('Error', 'Terjadi kesalahan saat memproses file. Pastikan format file dan kolom sudah benar.', 'error');
+                        } finally {
+                            event.target.value = '';
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                });
+
+                const exportRekapToExcel = () => {
+                    if (!currentRekapBranch || currentRekapData.length === 0) return;
+                    const title = `Laporan Rekapitulasi MCU - Cabang ${currentRekapBranch}`;
+                    const headers = ['NAMA PERUSAHAAN', 'NAMA PESERTA', 'NIK', 'USIA', 'JENIS KELAMIN', 'HASIL KESIMPULAN', 'STATUS KESEHATAN', 'NOTE', 'TGL. MCU', 'TGL. PENGIRIMAN HASIL', 'KPI (Hari)', 'LOKASI MCU', 'KET.'];
+                    const dataRows = currentRekapData.map(item => [
+                        item.namaPerusahaan, item.namaPeserta, item.nik, item.usia, item.jenisKelamin, 
+                        item.hasilKesimpulan, item.statusKesehatan, item.note, 
+                        new Date(item.tglMcu).toLocaleDateString('id-ID'), 
+                        new Date(item.tglPengiriman).toLocaleDateString('id-ID'), 
+                        item.kpi, item.lokasiMcu, item.ket
+                    ]);
+                    const dataToExport = [[title], [], headers].concat(dataRows);
+                    const worksheet = XLSX.utils.aoa_to_sheet(dataToExport);
+                    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }];
+                    if(worksheet['A1']) worksheet['A1'].s = { font: { bold: true, sz: 16 }, alignment: { horizontal: "center" } };
+                    headers.forEach((_, i) => {
+                        const cellRef = XLSX.utils.encode_cell({c: i, r: 2});
+                        if(worksheet[cellRef]) worksheet[cellRef].s = { font: { bold: true } };
+                    });
+                    const colWidths = headers.map((_, i) => ({ wch: Math.max(...dataToExport.map(row => row[i] ? row[i].toString().length : 0)) + 5 }));
+                    worksheet["!cols"] = colWidths;
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, `Rekap ${currentRekapBranch}`);
+                    const today = new Date().toISOString().slice(0, 10);
+                    XLSX.writeFile(workbook, `Rekapitulasi_MCU_${currentRekapBranch}_${today}.xlsx`);
+                };
+
+                rekapExportBtn.addEventListener('click', exportRekapToExcel);
+                
+                window.addEventListener('branchSelected', () => {
+                    if (unsubscribeRekap) unsubscribeRekap();
+                    if (!currentRekapBranch) return;
+
+                    const rekapCollectionRef = collection(db, `artifacts/${appId}/public/data/rekapitulasi/${currentRekapBranch}/data`);
+                    const q = query(rekapCollectionRef, orderBy("tglMcu"));
+                    unsubscribeRekap = onSnapshot(q, (snapshot) => {
+                        currentRekapData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                        if (!rekapViewPage.classList.contains('hidden')) {
+                           renderRekapTable();
+                        }
+                    });
+                });
+            };
+
+            // --- CONSOLIDATED REPORT SCRIPT ---
+            const consolidatedReportScript = () => {
+                const generateReportBtn = document.getElementById('generate-report-btn');
+                const reportModal = document.getElementById('report-modal');
+                const cancelReportBtn = document.getElementById('cancel-report-btn');
+                const confirmReportBtn = document.getElementById('confirm-report-btn');
+                const startDateInput = document.getElementById('start-date');
+                const endDateInput = document.getElementById('end-date');
+
+                generateReportBtn.addEventListener('click', () => {
+                    reportModal.classList.remove('hidden');
+                    reportModal.classList.add('flex');
+                });
+
+                cancelReportBtn.addEventListener('click', () => {
+                    reportModal.classList.add('hidden');
+                    reportModal.classList.remove('flex');
+                });
+                 reportModal.addEventListener('click', (e) => {
+                    if (e.target === reportModal) {
+                        reportModal.classList.add('hidden');
+                        reportModal.classList.remove('flex');
+                    }
+                });
+
+                confirmReportBtn.addEventListener('click', () => {
+                    const startDate = startDateInput.value;
+                    const endDate = endDateInput.value;
+
+                    if (!startDate || !endDate) {
+                        showInfoModal('Gagal', 'Silakan pilih tanggal mulai dan tanggal selesai.', 'error');
+                        return;
+                    }
+                    
+                    const rekapData = JSON.parse(localStorage.getItem('rekapitulasiMcuData')) || {};
+                    let allDataInRange = [];
+
+                    for (const branch in rekapData) {
+                        const branchData = rekapData[branch] || [];
+                        const filteredData = branchData.filter(item => {
+                            const mcuDate = new Date(item.tglMcu);
+                            return mcuDate >= new Date(startDate) && mcuDate <= new Date(endDate);
+                        });
+                        allDataInRange.push(...filteredData);
+                    }
+
+                    if (allDataInRange.length === 0) {
+                        showInfoModal('Informasi', 'Tidak ada data rekapitulasi yang ditemukan pada periode tanggal yang dipilih.', 'success');
+                        return;
+                    }
+                    
+                    exportConsolidatedRekapToExcel(allDataInRange, startDate, endDate);
+                    reportModal.classList.add('hidden');
+                    reportModal.classList.remove('flex');
+                });
+
+                 const exportConsolidatedRekapToExcel = (data, startDate, endDate) => {
+                    const title = `Laporan Rekapitulasi Konsolidasi MCU - Periode ${startDate} s/d ${endDate}`;
+                    const headers = ['NAMA PERUSAHAAN', 'NAMA PESERTA', 'NIK', 'USIA', 'JENIS KELAMIN', 'HASIL KESIMPULAN', 'STATUS KESEHATAN', 'NOTE', 'TGL. MCU', 'TGL. PENGIRIMAN HASIL', 'KPI (Hari)', 'LOKASI MCU', 'KET.'];
+                    const dataRows = data.map(item => [
+                        item.namaPerusahaan, item.namaPeserta, item.nik, item.usia, item.jenisKelamin, 
+                        item.hasilKesimpulan, item.statusKesehatan, item.note, 
+                        new Date(item.tglMcu).toLocaleDateString('id-ID'), 
+                        new Date(item.tglPengiriman).toLocaleDateString('id-ID'), 
+                        item.kpi, item.lokasiMcu, item.ket
+                    ]);
+                    const dataToExport = [[title], [], headers].concat(dataRows);
+                    const worksheet = XLSX.utils.aoa_to_sheet(dataToExport);
+                    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }];
+                    if(worksheet['A1']) worksheet['A1'].s = { font: { bold: true, sz: 16 }, alignment: { horizontal: "center" } };
+                    headers.forEach((_, i) => {
+                        const cellRef = XLSX.utils.encode_cell({c: i, r: 2});
+                        if(worksheet[cellRef]) worksheet[cellRef].s = { font: { bold: true } };
+                    });
+                    const colWidths = headers.map((_, i) => ({ wch: Math.max(...dataToExport.map(row => row[i] ? row[i].toString().length : 0)) + 5 }));
+                    worksheet["!cols"] = colWidths;
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, `Laporan Konsolidasi`);
+                    XLSX.writeFile(workbook, `Laporan_Konsolidasi_MCU_${startDate}_-_${endDate}.xlsx`);
+                };
+
+            };
+
+            // --- INITIATE SCRIPTS ---
+            if (firebaseConfig.apiKey) {
+                // Versi Online
+                console.log("Menjalankan dalam mode online (Firebase).");
+                // (Logika online akan berada di sini)
+            } else {
+                // Versi Offline/Lokal
+                console.log("Menjalankan dalam mode offline (localStorage).");
+                monitoringScript();
+                rekapScript();
+                consolidatedReportScript();
+            }
+        });
+    </script>
+</body>
+</html>
+
