@@ -152,7 +152,7 @@
                         </div>
                         <div>
                             <label for="email-tujuan" class="block text-sm font-medium text-slate-700 mb-1">Email Tujuan</label>
-                            <input type="email" id="email-tujuan" list="email-list" placeholder="Ketik atau pilih email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="email" id="email-tujuan" list="email-list" placeholder="email1@mail.com, email2@mail.com" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" multiple>
                             <datalist id="email-list"></datalist>
                         </div>
                         <div>
@@ -482,6 +482,11 @@
                                 (MCU PERIODIC) Kriteria Fit to work MCU ON SITE DAN EXTERNAL AMMAN FINAL.rev 21.3.2023
                             </a>
                         </li>
+                         <li>
+                            <a href="https://drive.google.com/drive/u/1/folders/1q3aFgt30iw8KCpOyr-QeOiZw9GCYrJhw" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                                Letak SP/GOP di Gdrive
+                            </a>
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -540,7 +545,6 @@
 
     <!-- SCRIPT UTAMA APLIKASI -->
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
@@ -568,7 +572,16 @@
         // =================================================================================
 
         // Main function to run the app
-        const main = () => {
+        function main() {
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("GANTI_DENGAN")) {
+                document.getElementById('login-page').innerHTML = `
+                <div class="text-center bg-white p-12 rounded-2xl shadow-xl">
+                    <h1 class="text-3xl font-bold text-red-600">Konfigurasi Error</h1>
+                    <p class="mt-2 text-slate-600">Konfigurasi Firebase belum diisi di dalam kode.<br>Aplikasi tidak dapat berjalan.</p>
+                </div>`;
+                return;
+            }
+            
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
