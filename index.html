@@ -239,7 +239,7 @@
                             <tbody id="data-view-table-body"></tbody>
                         </table>
                     </div>
-                    <p id="no-view-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data aktif.</p>
+                    <p id="no-view-data-message" class="text-center text-slate-500 py-8">Belum ada data aktif.</p>
                 </div>
             </div>
         </div>
@@ -595,6 +595,7 @@
             "tmcternate23@gmail.com",
             "mcusatelite22@gmail.com",
             "mcusatelite25@gmail.com",
+            "mr.tabalong4@gmail.com",
         ];
         // =================================================================================
 
@@ -839,7 +840,7 @@
                 const renderDataViewTable = (data = mcuData) => {
                     dataViewTableBody.innerHTML = '';
                     const dataToDisplay = data.filter(item => item.status !== 'Released');
-                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length > 0);
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
                     if (dataToDisplay.length === 0) return;
 
                     const groupedData = dataToDisplay.reduce((acc, item) => {
@@ -1492,6 +1493,4 @@
     </script>
 </body>
 </html>
-
-
 
