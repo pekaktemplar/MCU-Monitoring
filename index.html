@@ -239,7 +239,7 @@
                             <tbody id="data-view-table-body"></tbody>
                         </table>
                     </div>
-                    <p id="no-view-data-message" class="text-center text-slate-500 py-8">Belum ada data aktif.</p>
+                    <p id="no-view-data-message" class="text-center text-slate-500 py-8 hidden">Belum ada data aktif.</p>
                 </div>
             </div>
         </div>
@@ -597,7 +597,7 @@
             "mcusatelite25@gmail.com",
             "mr.tabalong4@gmail.com",
             "tirtamakassar157@gmail.com",
-            "mr.tmcyogyakarta@tirta.com",
+            "mrtmcyk@gmail.com",
             "tmcyogyakarta@tirta.co.id",
         ];
         // =================================================================================
@@ -843,7 +843,7 @@
                 const renderDataViewTable = (data = mcuData) => {
                     dataViewTableBody.innerHTML = '';
                     const dataToDisplay = data.filter(item => item.status !== 'Released');
-                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length > 0);
                     if (dataToDisplay.length === 0) return;
 
                     const groupedData = dataToDisplay.reduce((acc, item) => {
@@ -1193,7 +1193,7 @@
                     if (!currentRekapBranch) return;
                     
                     rekapTableBody.innerHTML = '';
-                    noRekapDataMessage.classList.toggle('hidden', currentRekapData.length === 0);
+                    noRekapDataMessage.classList.toggle('hidden', currentRekapData.length > 0);
                     currentRekapData.forEach(item => {
                         const row = document.createElement('tr');
                         row.className = 'bg-white border-b hover:bg-slate-50';
@@ -1330,10 +1330,15 @@
                                 const newRecord = {};
                                 for (const excelHeader in headerMapping) {
                                     const objectKey = headerMapping[excelHeader];
-                                    newRecord[objectKey] = row[excelHeader] !== undefined ? row[excelHeader] : '';
+                                    let value = row[excelHeader];
+                                    if ((objectKey === 'tglMcu' || objectKey === 'tglPengiriman') && value instanceof Date) {
+                                        const timezoneOffsetMs = value.getTimezoneOffset() * 60 * 1000;
+                                        const correctedDate = new Date(value.getTime() + timezoneOffsetMs);
+                                        newRecord[objectKey] = correctedDate.toISOString().split('T')[0];
+                                    } else {
+                                        newRecord[objectKey] = value !== undefined ? value : '';
+                                    }
                                 }
-                                if (newRecord.tglMcu instanceof Date) newRecord.tglMcu = newRecord.tglMcu.toISOString().split('T')[0];
-                                if (newRecord.tglPengiriman instanceof Date) newRecord.tglPengiriman = newRecord.tglPengiriman.toISOString().split('T')[0];
                                 newRecord.kpi = calculateKpi(newRecord.tglMcu, newRecord.tglPengiriman);
                                 return newRecord;
                             }).filter(record => record.namaPeserta);
@@ -1496,7 +1501,4 @@
     </script>
 </body>
 </html>
-
-
-
 
