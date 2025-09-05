@@ -619,7 +619,7 @@
             // --- SHARED ELEMENTS & DATA ---
             const klinikList = document.getElementById('klinik-list');
             const perusahaanList = document.getElementById('perusahaan-list');
-            const cabangKlinikOptions = ["Angsana", "Bali", "Balikpapan", "Banjarmasin", "Batu Sopang", "Berau Derawan", "Berau Pemuda", "Bogor", "BSD", "Cibinong", "Cikande", "Jakarta", "Karawang", "Luwuk", "Makassar", "Maluk", "Manado", "Mataram", "Medan", "Melak", "Morowali", "Muara Teweh", "Palembang", "Pekanbaru", "Samarinda", "Sangatta", "Semarang", "Sorong", "Surabaya", "Tambun", "Tanjung Tabalong", "Ternate", "Yogyakarta"];
+            const cabangKlinikOptions = ["Angsana", "Bali", "Balikpapan", "Bandung", "Banjarmasin", "Batu Sopang", "Berau Derawan", "Berau Pemuda", "Bogor", "BSD", "Cibinong", "Cikande", "Jakarta", "Karawang", "Luwuk", "Makassar", "Maluk", "Manado", "Mataram", "Medan", "Melak", "Morowali", "Muara Teweh", "Palembang", "Pekanbaru", "Samarinda", "Sangatta", "Semarang", "Sorong", "Surabaya", "Tambun", "Tanjung Tabalong", "Ternate", "Yogyakarta"];
             cabangKlinikOptions.forEach(cabang => {
                 const option = document.createElement('option');
                 option.value = cabang;
@@ -842,7 +842,7 @@
                 const renderDataViewTable = (data = mcuData) => {
                     dataViewTableBody.innerHTML = '';
                     const dataToDisplay = data.filter(item => item.status !== 'Released');
-                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length > 0);
                     if (dataToDisplay.length === 0) return;
 
                     const groupedData = dataToDisplay.reduce((acc, item) => {
