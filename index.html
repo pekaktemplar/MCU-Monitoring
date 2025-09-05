@@ -230,7 +230,7 @@
                                     <th scope="col" class="px-6 py-3">Tgl Pelaksanaan</th>
                                     <th scope="col" class="px-6 py-3">Deadline</th>
                                     <th scope="col" class="px-6 py-3 text-center w-48">Sisa Hari</th>
-                                    <th scope="col" class="px-6 py-3 text-center w-56">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-center w-64">Status</th>
                                     <th scope="col" class="px-6 py-3">Info Tambahan</th>
                                     <th scope="col" class="px-6 py-3 text-center">Rilis</th>
                                     <th scope="col" class="px-6 py-3 rounded-r-lg text-center">Aksi</th>
@@ -597,7 +597,6 @@
             "mcusatelite25@gmail.com",
             "mr.tabalong4@gmail.com",
             "tirtamakassar157@gmail.com",
-            "mrtmcyk@gmail.com",
             "tmcyogyakarta@tirta.co.id",
         ];
         // =================================================================================
@@ -843,7 +842,7 @@
                 const renderDataViewTable = (data = mcuData) => {
                     dataViewTableBody.innerHTML = '';
                     const dataToDisplay = data.filter(item => item.status !== 'Released');
-                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length > 0);
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
                     if (dataToDisplay.length === 0) return;
 
                     const groupedData = dataToDisplay.reduce((acc, item) => {
@@ -1193,7 +1192,7 @@
                     if (!currentRekapBranch) return;
                     
                     rekapTableBody.innerHTML = '';
-                    noRekapDataMessage.classList.toggle('hidden', currentRekapData.length > 0);
+                    noRekapDataMessage.classList.toggle('hidden', currentRekapData.length === 0);
                     currentRekapData.forEach(item => {
                         const row = document.createElement('tr');
                         row.className = 'bg-white border-b hover:bg-slate-50';
@@ -1496,7 +1495,6 @@
             consolidatedReportScript();
         }
 
-        // Run main function after the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', mainApp);
     </script>
 </body>
