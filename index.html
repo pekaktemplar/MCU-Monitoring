@@ -598,24 +598,6 @@
             "mr.tabalong4@gmail.com",
             "tirtamakassar157@gmail.com",
             "tmcyogyakarta@tirta.co.id",
-            "tmc3bandung@gmail.com",
-            "desyrahmawati570@gmail.com",
-            "tmcbandung3@gmail.com",
-            "mrtmcyk@gmail.com",
-            "tmcyogyakarta@tirta.co.id",
-            "astriarfat@gmail.com",
-            "emji.uni@gmail.com",
-            "nurse.tmctabalong@gmail.com",
-            "medical.mtw@gmail.com",
-            "mr.tmcmorowali@gmail.com",
-            "tmcmorowali71@gmail.com",
-            "dewresti22@gmail.com",
-            "tmcbogor4@gmail.com",
-            "mrtmcmorowali@gmail.com",
-            "mrtmcbogor@gmail.com",
-            "satriaksiangan@gmail.com",
-            "rcptbppn@gmail.com",
-            "tmcbalikpapan.2025@gmail.com",
         ];
         // =================================================================================
 
@@ -860,7 +842,7 @@
                 const renderDataViewTable = (data = mcuData) => {
                     dataViewTableBody.innerHTML = '';
                     const dataToDisplay = data.filter(item => item.status !== 'Released');
-                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length > 0);
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
                     if (dataToDisplay.length === 0) return;
 
                     const groupedData = dataToDisplay.reduce((acc, item) => {
@@ -1517,14 +1499,4 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
 
