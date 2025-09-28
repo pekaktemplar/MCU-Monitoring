@@ -21,9 +21,21 @@
 
     <style>
         /* Custom styles to complement Tailwind */
+        :root {
+            --bg-main: #fefdfc;
+            --bg-subtle: #eaf1ed;
+            --primary-blue: #154887;
+            --primary-blue-darker: #194e91;
+            --secondary-blue: #32629d;
+            --accent-gold: #b39058;
+            --accent-gold-darker: #b68103;
+            --accent-gold-light: #e9d9b0;
+            --alert-red: #ee2228;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
+            background-color: var(--bg-subtle);
         }
         /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
@@ -42,8 +54,8 @@
         }
         /* Style for the form when in edit mode */
         .editing-mode {
-            border: 2px solid #3b82f6; /* blue-500 */
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            border: 2px solid var(--primary-blue);
+            box-shadow: 0 0 15px rgba(21, 72, 135, 0.2);
         }
         .table-responsive {
             display: block;
@@ -64,36 +76,58 @@
             border: 1px solid transparent;
             border-radius: 6px;
             padding: 4px 6px;
-            transition: border-color 0.2s;
+            transition: all 0.3s ease-in-out;
         }
         .info-input:focus, .status-select:focus {
             outline: none;
-            border-color: #3b82f6; /* blue-500 */
+            border-color: var(--primary-blue);
         }
         /* Tab styling */
         .tab-btn.active {
-            border-color: #3b82f6; /* blue-500 */
-            color: #3b82f6;
-            background-color: #eff6ff; /* blue-50 */
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background-color: var(--bg-subtle);
         }
-        /* Branch button styling */
-        .branch-button {
-            transition: all 0.2s;
+
+        /* Enhanced button and interactive element animations */
+        .btn-primary {
+            background-color: var(--primary-blue);
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
-        .branch-button:hover {
+        .btn-primary:hover {
+            background-color: var(--primary-blue-darker);
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
         }
+        
+        .icon-btn {
+             transition: all 0.3s ease-in-out;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Modal Animation */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-content-animate {
+            animation: fadeInScale 0.3s ease-out forwards;
+        }
+
     </style>
 </head>
 <body class="text-slate-800">
 
     <!-- Login Page -->
-    <div id="login-page" class="flex items-center justify-center min-h-screen bg-slate-100">
-        <div class="text-center bg-white p-12 rounded-2xl shadow-xl">
-            <h1 class="text-3xl font-bold text-slate-900">Aplikasi Monitoring MCU</h1>
+    <div id="login-page" class="flex items-center justify-center min-h-screen">
+        <div class="text-center bg-white p-12 rounded-2xl shadow-xl modal-content-animate">
+            <h1 class="text-3xl font-bold" style="color: var(--primary-blue);">Aplikasi Monitoring MCU</h1>
             <p class="mt-2 text-slate-600">Silakan masuk untuk melanjutkan.</p>
-            <button id="google-signin-btn" class="mt-8 inline-flex items-center gap-3 bg-white border border-slate-300 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-50 transition">
+            <button id="google-signin-btn" class="mt-8 inline-flex items-center gap-3 bg-white border border-slate-300 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-50 transition-all duration-300 ease-in-out hover:shadow-md hover:transform hover:-translate-y-1">
                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.542,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
                 <span>Masuk dengan Google</span>
             </button>
@@ -108,28 +142,28 @@
             <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
                 <!-- Header Section -->
                 <header class="mb-8 text-center">
-                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Dashboard Monitoring MCU</h1>
-                    <p class="mt-2 text-lg text-slate-600">PT Amman di Tirta Medical Centre</p>
+                    <h1 class="text-3xl md:text-4xl font-bold" style="color: var(--primary-blue);">Dashboard Monitoring MCU</h1>
+                    <p class="mt-2 text-lg" style="color: var(--secondary-blue);">PT Amman di Tirta Medical Centre</p>
                 </header>
 
                 <!-- Form Section for Data Entry -->
-                <div id="data-form-container" class="bg-white p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300">
+                <div id="data-form-container" class="p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300" style="background-color: var(--bg-main);">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 id="form-title" class="text-2xl font-semibold text-slate-800">Tambah Data Peserta MCU Baru</h2>
+                        <h2 id="form-title" class="text-2xl font-semibold" style="color: var(--primary-blue);">Tambah Data Peserta MCU Baru</h2>
                         <div class="flex items-center gap-2">
-                             <button id="view-data-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Semua Data">
+                             <button id="view-data-btn" class="icon-btn p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full" title="Lihat Semua Data">
                                 <i data-feather="table" class="w-6 h-6"></i>
                             </button>
-                            <button id="rekap-btn" class="p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full transition" title="Buka Halaman Rekapitulasi">
+                            <button id="rekap-btn" class="icon-btn p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full" title="Buka Halaman Rekapitulasi">
                                 <i data-feather="archive" class="w-6 h-6"></i>
                             </button>
-                            <button id="generate-report-btn" class="p-2 text-slate-500 hover:text-yellow-600 hover:bg-yellow-100 rounded-full transition" title="Buat Laporan Konsolidasi">
+                            <button id="generate-report-btn" class="icon-btn p-2 text-slate-500 hover:text-yellow-600 hover:bg-yellow-100 rounded-full" title="Buat Laporan Konsolidasi">
                                 <i data-feather="file-text" class="w-6 h-6"></i>
                             </button>
-                            <button id="rules-btn" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full transition" title="Lihat Aturan">
+                            <button id="rules-btn" class="icon-btn p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full" title="Lihat Aturan">
                                 <i data-feather="book-open" class="w-6 h-6"></i>
                             </button>
-                            <button id="signout-btn" class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-100 rounded-full transition" title="Keluar">
+                            <button id="signout-btn" class="icon-btn p-2 text-slate-500 hover:text-red-600 hover:bg-red-100 rounded-full" title="Keluar">
                                 <i data-feather="log-out" class="w-6 h-6"></i>
                             </button>
                         </div>
@@ -139,33 +173,33 @@
                         <input type="hidden" id="edit-id">
                         <div>
                             <label for="nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta MCU</label>
-                            <input type="text" id="nama-peserta" placeholder="Contoh: Budi Santoso" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="text" id="nama-peserta" placeholder="Contoh: Budi Santoso" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="asal-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Asal Perusahaan</label>
-                            <input type="text" id="asal-perusahaan" list="perusahaan-list" placeholder="Ketik atau pilih perusahaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="text" id="asal-perusahaan" list="perusahaan-list" placeholder="Ketik atau pilih perusahaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                             <datalist id="perusahaan-list"></datalist>
                         </div>
                         <div>
                             <label for="surat-pengantar" class="block text-sm font-medium text-slate-700 mb-1">Surat Pengantar (SP)</label>
-                            <input type="text" id="surat-pengantar" placeholder="Nomor SP, URL, atau 'menyusul'" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="text" id="surat-pengantar" placeholder="Nomor SP, URL, atau 'menyusul'" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="email-tujuan" class="block text-sm font-medium text-slate-700 mb-1">Email Tujuan</label>
-                            <input type="text" id="email-tujuan" list="email-list" placeholder="email1@mail.com, email2@mail.com" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="text" id="email-tujuan" list="email-list" placeholder="email1@mail.com, email2@mail.com" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                             <datalist id="email-list"></datalist>
                         </div>
                         <div>
                             <label for="tanggal-pelaksanaan" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Pelaksanaan</label>
-                            <input type="date" id="tanggal-pelaksanaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="date" id="tanggal-pelaksanaan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="tanggal-deadline" class="block text-sm font-medium text-slate-700 mb-1">Deadline Release Hasil</label>
-                            <input type="date" id="tanggal-deadline" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-slate-50" readonly>
+                            <input type="date" id="tanggal-deadline" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300 bg-slate-50" style="--tw-ring-color: var(--primary-blue)" readonly>
                         </div>
                         <div>
                             <label for="status" class="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                            <select id="status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <select id="status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                                 <option value="Pending">Pending</option>
                                 <option value="On Process">On Process</option>
                                 <option value="Released">Released</option>
@@ -174,12 +208,12 @@
                         </div>
                         <div>
                             <label for="cabang-klinik" class="block text-sm font-medium text-slate-700 mb-1">Cabang Klinik</label>
-                            <input type="text" id="cabang-klinik" list="klinik-list" placeholder="Ketik untuk mencari..." required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="text" id="cabang-klinik" list="klinik-list" placeholder="Ketik untuk mencari..." required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                             <datalist id="klinik-list"></datalist>
                         </div>
                         <div class="md:col-span-3 flex items-center justify-end gap-4 pt-4">
-                            <button type="button" id="cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Batal</button>
-                            <button type="submit" id="submit-btn" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                            <button type="button" id="cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium rounded-lg hover:opacity-80 transition-all duration-300" style="background-color: var(--accent-gold-light); color: var(--accent-gold-darker);">Batal</button>
+                            <button type="submit" id="submit-btn" class="btn-primary px-5 py-2.5 text-sm font-medium text-white rounded-lg flex items-center gap-2">
                                 <i data-feather="plus-circle" class="w-5 h-5"></i>
                                 <span id="submit-btn-text">Tambah Data</span>
                             </button>
@@ -198,22 +232,22 @@
         <div id="data-view-page" class="hidden">
             <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
                 <header class="mb-8 flex justify-between items-center">
-                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Semua Data Pelaksanaan MCU</h1>
-                    <button id="back-to-monitoring-from-view-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                    <h1 class="text-3xl md:text-4xl font-bold" style="color: var(--primary-blue);">Semua Data Pelaksanaan MCU</h1>
+                    <button id="back-to-monitoring-from-view-btn" class="btn-primary px-4 py-2 text-sm font-medium text-white rounded-lg flex items-center gap-2">
                         <i data-feather="arrow-left" class="w-5 h-5"></i>
                         <span>Kembali ke Dashboard</span>
                     </button>
                 </header>
 
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="p-6 rounded-2xl shadow-lg" style="background-color: var(--bg-main);">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                          <div class="relative flex-grow w-full md:w-auto">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <i data-feather="search" class="w-5 h-5 text-slate-400"></i>
                             </div>
-                            <input type="text" id="view-search-input" placeholder="Cari Nama atau Perusahaan..." class="w-full md:w-80 pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <input type="text" id="view-search-input" placeholder="Cari Nama atau Perusahaan..." class="w-full md:w-80 pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 transition-all duration-300" style="--tw-ring-color: var(--primary-blue)">
                         </div>
-                        <button id="view-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition flex items-center gap-2 whitespace-nowrap">
+                        <button id="view-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out hover:transform hover:-translate-y-0.5 flex items-center gap-2">
                             <i data-feather="download" class="w-4 h-4"></i>
                             <span>Export ke Excel</span>
                         </button>
@@ -221,7 +255,7 @@
                     
                     <div class="table-responsive">
                         <table class="w-full text-sm text-left text-slate-500">
-                            <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                            <thead class="text-xs uppercase" style="color: var(--primary-blue-darker); background-color: var(--accent-gold-light);">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 rounded-l-lg">Nama Peserta</th>
                                     <th scope="col" class="px-6 py-3">Perusahaan</th>
@@ -248,9 +282,9 @@
         <div id="rekap-page" class="hidden">
             <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
                 <header class="mb-8 flex justify-between items-center">
-                    <h1 id="rekap-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Rekapitulasi Data MCU</h1>
+                    <h1 id="rekap-header-title" class="text-3xl md:text-4xl font-bold" style="color: var(--primary-blue);">Rekapitulasi Data MCU</h1>
                     <div>
-                        <button id="back-to-monitoring-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                        <button id="back-to-monitoring-btn" class="btn-primary px-4 py-2 text-sm font-medium text-white rounded-lg flex items-center gap-2">
                             <i data-feather="arrow-left" class="w-5 h-5"></i>
                             <span>Kembali ke Monitoring</span>
                         </button>
@@ -258,14 +292,14 @@
                 </header>
 
                 <!-- Form Rekapitulasi -->
-                <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                <div class="p-6 rounded-2xl shadow-lg mb-8" style="background-color: var(--bg-main);">
                      <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold text-slate-800">Tambah Data Rekapitulasi</h2>
+                        <h2 class="text-2xl font-semibold" style="color: var(--primary-blue);">Tambah Data Rekapitulasi</h2>
                         <div class="flex items-center gap-2">
-                            <button id="import-rekap-btn" class="p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-100 rounded-full transition" title="Import Data dari Excel">
+                            <button id="import-rekap-btn" class="icon-btn p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-100 rounded-full" title="Import Data dari Excel">
                                 <i data-feather="upload" class="w-6 h-6"></i>
                             </button>
-                            <button id="view-rekap-btn" class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full transition" title="Lihat Tabel Rekapitulasi">
+                            <button id="view-rekap-btn" class="icon-btn p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-full" title="Lihat Tabel Rekapitulasi">
                                 <i data-feather="table" class="w-6 h-6"></i>
                             </button>
                         </div>
@@ -275,34 +309,34 @@
                         <input type="hidden" id="rekap-edit-id">
                         <div>
                             <label for="rekap-nama-perusahaan" class="block text-sm font-medium text-slate-700 mb-1">Nama Perusahaan</label>
-                            <input type="text" id="rekap-nama-perusahaan" list="perusahaan-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="rekap-nama-perusahaan" list="perusahaan-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-nama-peserta" class="block text-sm font-medium text-slate-700 mb-1">Nama Peserta</label>
-                            <input type="text" id="rekap-nama-peserta" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="rekap-nama-peserta" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-nik" class="block text-sm font-medium text-slate-700 mb-1">NIK</label>
-                            <input type="text" id="rekap-nik" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="rekap-nik" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-usia" class="block text-sm font-medium text-slate-700 mb-1">Usia</label>
-                            <input type="number" id="rekap-usia" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="number" id="rekap-usia" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-jenis-kelamin" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
-                            <select id="rekap-jenis-kelamin" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <select id="rekap-jenis-kelamin" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                                 <option>Pria</option>
                                 <option>Wanita</option>
                             </select>
                         </div>
                         <div>
                             <label for="rekap-hasil-kesimpulan" class="block text-sm font-medium text-slate-700 mb-1">Hasil Kesimpulan</label>
-                            <input type="text" id="rekap-hasil-kesimpulan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="rekap-hasil-kesimpulan" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-status-kesehatan" class="block text-sm font-medium text-slate-700 mb-1">Status Kesehatan</label>
-                            <select id="rekap-status-kesehatan" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <select id="rekap-status-kesehatan" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                                 <option>FIT</option>
                                 <option>FIT WITH NOTE RINGAN</option>
                                 <option>FIT WITH NOTE SEDANG</option>
@@ -313,15 +347,15 @@
                         </div>
                         <div>
                             <label for="rekap-note" class="block text-sm font-medium text-slate-700 mb-1">Note</label>
-                            <input type="text" id="rekap-note" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="rekap-note" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-tgl-mcu" class="block text-sm font-medium text-slate-700 mb-1">Tgl. MCU</label>
-                            <input type="date" id="rekap-tgl-mcu" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="date" id="rekap-tgl-mcu" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-tgl-pengiriman" class="block text-sm font-medium text-slate-700 mb-1">Tgl. Pengiriman Hasil</label>
-                            <input type="date" id="rekap-tgl-pengiriman" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="date" id="rekap-tgl-pengiriman" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div>
                             <label for="rekap-kpi" class="block text-sm font-medium text-slate-700 mb-1">KPI (Hari)</label>
@@ -329,15 +363,15 @@
                         </div>
                         <div>
                             <label for="rekap-lokasi-mcu" class="block text-sm font-medium text-slate-700 mb-1">Lokasi MCU</label>
-                            <input type="text" id="rekap-lokasi-mcu" list="klinik-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="rekap-lokasi-mcu" list="klinik-list" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div class="md:col-span-full">
                             <label for="rekap-ket" class="block text-sm font-medium text-slate-700 mb-1">Keterangan</label>
-                            <input type="text" id="rekap-ket" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="rekap-ket" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                         </div>
                         <div class="md:col-span-full flex justify-end gap-4">
-                             <button type="button" id="rekap-cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg">Batal</button>
-                            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg flex items-center gap-2">
+                             <button type="button" id="rekap-cancel-edit-btn" class="hidden px-5 py-2.5 text-sm font-medium rounded-lg hover:opacity-80 transition-all duration-300" style="background-color: var(--accent-gold-light); color: var(--accent-gold-darker);">Batal</button>
+                            <button type="submit" class="btn-primary px-5 py-2.5 text-sm font-medium text-white rounded-lg flex items-center gap-2">
                                 <i data-feather="plus-circle" class="w-5 h-5"></i>
                                 <span id="rekap-submit-btn-text">Tambah Rekap</span>
                             </button>
@@ -351,24 +385,24 @@
         <div id="rekap-view-page" class="hidden">
             <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
                 <header class="mb-8 flex justify-between items-center">
-                    <h1 id="rekap-view-header-title" class="text-3xl md:text-4xl font-bold text-slate-900">Tabel Rekapitulasi</h1>
-                    <button id="back-to-rekap-form-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition flex items-center gap-2">
+                    <h1 id="rekap-view-header-title" class="text-3xl md:text-4xl font-bold" style="color: var(--primary-blue);">Tabel Rekapitulasi</h1>
+                    <button id="back-to-rekap-form-btn" class="btn-primary px-4 py-2 text-sm font-medium text-white rounded-lg flex items-center gap-2">
                         <i data-feather="arrow-left" class="w-5 h-5"></i>
                         <span>Kembali ke Input Rekap</span>
                     </button>
                 </header>
 
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="p-6 rounded-2xl shadow-lg" style="background-color: var(--bg-main);">
                      <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                        <h2 class="text-2xl font-semibold text-slate-800">Data Rekapitulasi</h2>
-                        <button id="rekap-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg flex items-center gap-2 whitespace-nowrap">
+                        <h2 class="text-2xl font-semibold" style="color: var(--primary-blue);">Data Rekapitulasi</h2>
+                        <button id="rekap-export-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out hover:transform hover:-translate-y-0.5 flex items-center gap-2">
                             <i data-feather="download" class="w-4 h-4"></i>
                             <span>Export Rekap ke Excel</span>
                         </button>
                     </div>
                     <div class="table-responsive">
                         <table class="w-full text-sm text-left text-slate-500">
-                            <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                            <thead class="text-xs uppercase" style="color: var(--primary-blue-darker); background-color: var(--accent-gold-light);">
                                 <tr>
                                     <th class="px-6 py-3">Nama Perusahaan</th>
                                     <th class="px-6 py-3">Nama Peserta</th>
@@ -390,35 +424,35 @@
     </div>
     
     <!-- Modals (Detail, Confirm, Rules, Report) -->
-    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative">
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative modal-content-animate">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800"><i data-feather="x" class="w-6 h-6"></i></button>
-            <h3 class="text-2xl font-bold mb-6 text-slate-900" id="modal-title">Detail Data MCU</h3>
+            <h3 class="text-2xl font-bold mb-6" id="modal-title" style="color: var(--primary-blue);">Detail Data MCU</h3>
             <div id="modal-content" class="space-y-4 text-slate-700"></div>
         </div>
     </div>
-    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100"><i data-feather="alert-triangle" class="h-6 w-6 text-red-600"></i></div>
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center modal-content-animate">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full" style="background-color: var(--alert-red); opacity: 0.2"><i data-feather="alert-triangle" class="h-6 w-6" style="color: var(--alert-red);"></i></div>
             <h3 class="text-lg font-medium leading-6 text-gray-900 mt-5" id="confirm-title">Hapus Data Peserta</h3>
             <div class="mt-2"><p class="text-sm text-gray-500" id="confirm-message"></p></div>
             <div class="mt-6 flex justify-center gap-4">
-                <button type="button" id="cancel-delete-btn" class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
-                <button type="button" id="confirm-delete-btn" class="px-6 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700">Hapus</button>
+                <button type="button" id="cancel-delete-btn" class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-300">Batal</button>
+                <button type="button" id="confirm-delete-btn" class="px-6 py-2 text-sm font-medium text-white border border-transparent rounded-lg transition-all duration-300" style="background-color: var(--alert-red);">Hapus</button>
             </div>
         </div>
     </div>
-    <div id="rules-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+    <div id="rules-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col modal-content-animate">
             <div class="flex justify-between items-center p-6 border-b">
-                <h3 class="text-2xl font-bold text-slate-900">Aturan dan Prosedur</h3>
+                <h3 class="text-2xl font-bold" style="color: var(--primary-blue);">Aturan dan Prosedur</h3>
                 <button id="close-rules-modal-btn" class="text-slate-500 hover:text-slate-800"><i data-feather="x" class="w-6 h-6"></i></button>
             </div>
             <div class="p-6 border-b">
                 <div id="tabs-container" class="flex gap-2 sm:gap-4 overflow-x-auto pb-2">
-                    <button class="tab-btn active px-4 py-2 border-b-2 font-semibold whitespace-nowrap" data-tab="release">Release Hasil</button>
-                    <button class="tab-btn px-4 py-2 border-b-2 font-semibold text-slate-500 whitespace-nowrap" data-tab="alcodrug">Alcodrug Positive</button>
-                    <button class="tab-btn px-4 py-2 border-b-2 font-semibold text-slate-500 whitespace-nowrap" data-tab="resources">Resources</button>
+                    <button class="tab-btn active px-4 py-2 border-b-2 font-semibold whitespace-nowrap transition-all duration-300" data-tab="release">Release Hasil</button>
+                    <button class="tab-btn px-4 py-2 border-b-2 font-semibold text-slate-500 whitespace-nowrap transition-all duration-300" data-tab="alcodrug">Alcodrug Positive</button>
+                    <button class="tab-btn px-4 py-2 border-b-2 font-semibold text-slate-500 whitespace-nowrap transition-all duration-300" data-tab="resources">Resources</button>
                 </div>
             </div>
             <div class="p-6 overflow-y-auto flex-grow">
@@ -494,13 +528,11 @@
     </div>
     
     <!-- Branch Selection Modal -->
-    <div id="branch-selection-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+    <div id="branch-selection-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col modal-content-animate">
             <div class="flex justify-between items-center p-6 border-b">
-                <h3 class="text-2xl font-bold text-slate-900">Pilih Cabang untuk Rekapitulasi</h3>
-                <button id="close-branch-modal-btn" class="text-slate-500 hover:text-slate-800">
-                    <i data-feather="x" class="w-6 h-6"></i>
-                </button>
+                <h3 class="text-2xl font-bold" style="color: var(--primary-blue);">Pilih Cabang untuk Rekapitulasi</h3>
+                <button id="close-branch-modal-btn" class="text-slate-500 hover:text-slate-800"><i data-feather="x" class="w-6 h-6"></i></button>
             </div>
             <div id="branch-list-container" class="p-8 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <!-- Branch buttons will be injected here -->
@@ -509,36 +541,36 @@
     </div>
     
     <!-- Report Date Range Modal -->
-    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-            <h3 class="text-lg font-medium leading-6 text-gray-900" id="confirm-title">Pilih Periode Laporan</h3>
+    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 modal-content-animate">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Pilih Periode Laporan</h3>
             <div class="mt-4 grid grid-cols-1 gap-4">
                  <div>
                     <label for="start-date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Mulai</label>
-                    <input type="date" id="start-date" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <input type="date" id="start-date" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                 </div>
                 <div>
                     <label for="end-date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Selesai</label>
-                    <input type="date" id="end-date" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <input type="date" id="end-date" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2" style="--tw-ring-color: var(--primary-blue)">
                 </div>
             </div>
             <div class="mt-6 flex justify-end gap-4">
-                <button type="button" id="cancel-report-btn" class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
-                <button type="button" id="confirm-report-btn" class="px-6 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-lg hover:bg-green-700">Buat Laporan</button>
+                <button type="button" id="cancel-report-btn" class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-300">Batal</button>
+                <button type="button" id="confirm-report-btn" class="px-6 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-lg hover:bg-green-700 transition-all duration-300">Buat Laporan</button>
             </div>
         </div>
     </div>
 
     <!-- Info Modal -->
-    <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+    <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center modal-content-animate">
             <div id="info-modal-icon-container" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
                 <!-- Icon will be inserted here -->
             </div>
             <h3 class="text-lg font-medium leading-6 text-gray-900 mt-5" id="info-modal-title"></h3>
             <div class="mt-2"><p class="text-sm text-gray-500" id="info-modal-message"></p></div>
             <div class="mt-6 flex justify-center gap-4">
-                <button type="button" id="info-modal-close-btn" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">OK</button>
+                <button type="button" id="info-modal-close-btn" class="btn-primary px-6 py-2 text-sm font-medium text-white rounded-lg">OK</button>
             </div>
         </div>
     </div>
@@ -693,7 +725,7 @@
 
             cabangKlinikOptions.sort().forEach(branch => {
                 const button = document.createElement('button');
-                button.className = 'branch-button w-full text-left p-4 bg-slate-100 hover:bg-blue-100 hover:text-blue-700 rounded-lg font-semibold';
+                button.className = 'branch-button w-full text-left p-4 bg-white hover:bg-slate-50 rounded-lg font-semibold border';
                 button.textContent = branch;
                 button.dataset.branch = branch;
                 branchListContainer.appendChild(button);
@@ -842,7 +874,7 @@
                 const renderDataViewTable = (data = mcuData) => {
                     dataViewTableBody.innerHTML = '';
                     const dataToDisplay = data.filter(item => item.status !== 'Released');
-                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length > 0);
                     if (dataToDisplay.length === 0) return;
 
                     const groupedData = dataToDisplay.reduce((acc, item) => {
@@ -856,8 +888,9 @@
 
                     sortedBranches.forEach(branch => {
                         const headerRow = document.createElement('tr');
-                        headerRow.className = 'bg-slate-200 sticky top-0 z-10';
-                        headerRow.innerHTML = `<td colspan="12" class="px-6 py-3 font-bold text-slate-800 text-base">${branch.toUpperCase()}</td>`;
+                        headerRow.className = 'sticky top-0 z-10';
+                        headerRow.style.backgroundColor = 'var(--accent-gold-light)';
+                        headerRow.innerHTML = `<td colspan="12" class="px-6 py-3 font-bold text-base" style="color: var(--primary-blue-darker);">${branch.toUpperCase()}</td>`;
                         dataViewTableBody.appendChild(headerRow);
 
                         const branchItems = groupedData[branch];
@@ -911,9 +944,9 @@
                                 <td class="px-6 py-4 text-center"><input type="checkbox" class="release-checkbox h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" data-id="${item.id}" ${item.status === 'Released' ? 'checked' : ''} ${item.status === 'Cancelled' ? 'disabled' : ''}></td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button class="view-btn p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full transition" data-id="${item.id}" title="Lihat Detail"><i data-feather="eye" class="w-4 h-4"></i></button>
-                                        <button class="edit-btn p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full transition" data-id="${item.id}" title="Ubah Data"><i data-feather="edit-2" class="w-4 h-4"></i></button>
-                                        <button class="delete-btn p-2 text-slate-500 hover:text-red-600 hover:bg-red-100 rounded-full transition" data-id="${item.id}" title="Hapus Data"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                                        <button class="view-btn icon-btn p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-100 rounded-full" data-id="${item.id}" title="Lihat Detail"><i data-feather="eye" class="w-4 h-4"></i></button>
+                                        <button class="edit-btn icon-btn p-2 text-slate-500 hover:text-green-600 hover:bg-green-100 rounded-full" data-id="${item.id}" title="Ubah Data"><i data-feather="edit-2" class="w-4 h-4"></i></button>
+                                        <button class="delete-btn icon-btn p-2 text-slate-500 hover:text-red-600 hover:bg-red-100 rounded-full" data-id="${item.id}" title="Hapus Data"><i data-feather="trash-2" class="w-4 h-4"></i></button>
                                     </div>
                                 </td>
                             `;
