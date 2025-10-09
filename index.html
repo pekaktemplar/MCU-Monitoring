@@ -594,6 +594,45 @@
         };
         // =================================================================================
 
+        // =================================================================================
+        // DAFTAR EMAIL YANG DIIZINKAN (WAJIB DIISI)
+        // =================================================================================
+        const allowedEmails = [
+            "pekaktemplar@gmail.com",
+            "agusbudiarthalg@gmail.com",
+            "mr.tmctaliwang@gmail.com",
+            "mrtmcmataram@gmail.com",
+            "mrtmcserpong3@gmail.com",
+            "mrtmcmanado@gmail.com",
+            "resepsionistmcbsd@gmail.com",
+            "tmctaliwang@gmail.com",
+            "mr.tmcsorong@gmail.com",
+            "tmcmataram08@gmail.com",
+            "akreditasiklinikbellagio@gmail.com",
+            "mr.tmcbalikpapan@tirta.co.id",
+            "tmcpekanbaru25@gmail.com",
+            "mr.fhcbali@gmail.com",
+            "tmcsmdxamman@gmail.com",
+            "bellagiomrharian@gmail.com",
+            "mr.cikande27@gmail.com",
+            "tmcpekanbaru23@gmail.com",
+            "tirtamedicalcentrekarawang@gmail.com",
+            "tmctambun@gmail.com",
+            "tmcmuarateweh@tirta.co.id",
+            "tmcsemarang1@gmail.com",
+            "karawangtmc@gmail.com",
+            "mujayanti@seemedik.com",
+            "mrtmcsurabaya2024@gmail.com",
+            "tmcsurabaya@tirta.co.id",
+            "tmcternate23@gmail.com",
+            "mcusatelite22@gmail.com",
+            "mcusatelite25@gmail.com",
+            "mr.tabalong4@gmail.com",
+            "tirtamakassar157@gmail.com",
+            "tmcyogyakarta@tirta.co.id",
+        ];
+        // =================================================================================
+
         function mainApp() {
             if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("GANTI_DENGAN")) {
                 document.getElementById('login-page').innerHTML = `
@@ -646,27 +685,19 @@
                 }
             });
 
-            onAuthStateChanged(auth, async (user) => {
+            onAuthStateChanged(auth, user => {
                 if (user) {
-                    try {
-                        const userDocRef = doc(db, 'authorized_users', user.email);
-                        const userDoc = await getDoc(userDocRef);
-
-                        if (userDoc.exists()) {
-                            authError.classList.add('hidden');
-                            loginPage.classList.add('hidden');
-                            appContainer.classList.remove('hidden');
-                            window.dispatchEvent(new CustomEvent('firebase-auth-ready'));
-                            feather.replace();
-                        } else {
-                            throw new Error("User not authorized.");
-                        }
-                    } catch (error) {
-                        console.error("Authorization check failed:", error);
-                        authError.innerHTML = `Akses ditolak.<br>Email Anda (${user.email}) tidak terdaftar.<br>Silakan hubungi administrator.`;
+                    if (allowedEmails.length > 0 && !allowedEmails.includes(user.email)) {
+                        authError.textContent = `Akses ditolak untuk ${user.email}. Silakan hubungi administrator.`;
                         authError.classList.remove('hidden');
-                        await signOut(auth);
+                        signOut(auth);
+                        return;
                     }
+                    authError.classList.add('hidden');
+                    loginPage.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    window.dispatchEvent(new CustomEvent('firebase-auth-ready'));
+                    feather.replace();
                 } else {
                     loginPage.classList.remove('hidden');
                     appContainer.classList.add('hidden');
@@ -843,7 +874,7 @@
                 const renderDataViewTable = (data = mcuData) => {
                     dataViewTableBody.innerHTML = '';
                     const dataToDisplay = data.filter(item => item.status !== 'Released');
-                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length === 0);
+                    noViewDataMessage.classList.toggle('hidden', dataToDisplay.length > 0);
                     if (dataToDisplay.length === 0) return;
 
                     const groupedData = dataToDisplay.reduce((acc, item) => {
@@ -1138,16 +1169,6 @@
                         populateDatalists();
                         if (!dataViewPage.classList.contains('hidden')) {
                             renderDataViewTable();
-                        }
-                    }, (error) => {
-                        console.error("Firestore permission error:", error);
-                        if(error.code === 'permission-denied') {
-                             showInfoModal(
-                                'Akses Data Ditolak', 
-                                `Login Google berhasil dengan email: ${auth.currentUser.email}. Namun, Anda tidak memiliki izin untuk melihat data ini. Pastikan email Anda sudah terdaftar oleh administrator.`, 
-                                'error'
-                            );
-                            signOut(auth);
                         }
                     });
                 }
@@ -1511,4 +1532,3 @@
     </script>
 </body>
 </html>
-
